@@ -105,3 +105,16 @@
   background-position: center;
   background-repeat: no-repeat;
 }
+
+/* Maximizar imagen en diamante — sin padding ni recorte */
+#survivor .perk-inner {
+  padding: 0;
+}
+#survivor .perk-img-div {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 0;
+}
