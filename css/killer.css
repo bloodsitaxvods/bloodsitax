@@ -155,14 +155,16 @@
 .perk-slot[data-i="3"] { top: 150px; left: 81px;  }
 
 .perk-inner {
-  transform: rotate(-45deg); width: 100%; height: 100%;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 0; padding: 0;
+  transform: rotate(-45deg);
+  width: 100%; height: 100%;
+  display: block;
+  padding: 0;
 }
 
 .killer-perk {
-  display: flex; flex-direction: column; align-items: center;
-  width: 100%; height: 100%; gap: 0; overflow: hidden;
+  display: block;
+  width: 100%; height: 100%;
+  overflow: hidden;
 }
 .killer-perk.killer-perk-locked { animation: pLock .7s ease-out forwards; }
 @keyframes pLock {
@@ -171,8 +173,11 @@
 }
 
 .perk-img-div {
-  width: 100%; height: 100%; flex: 1; flex-shrink: 0;
-  background-size: cover; background-position: center; background-repeat: no-repeat;
+  display: block;
+  width: 100%; height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-radius: 0;
 }
 .perk-mini-label {
