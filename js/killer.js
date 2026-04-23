@@ -7,7 +7,7 @@
 /* ══════════════════════════════════════════════════
    DATA  — killers + perks con rutas de imagen reales
 ══════════════════════════════════════════════════ */
-const PLACEHOLDER = 'interrogacion.jpg';
+const PLACEHOLDER = 'interrogacion.png';
 
 const PERK_FILES = [
   'agitation.png','alien-instinct.png','all-shaking-thunder.png','a-nurses-calling.png',

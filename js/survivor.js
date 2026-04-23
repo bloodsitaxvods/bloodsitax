@@ -5,7 +5,7 @@
 (function () {
 'use strict';
 
-const PLACEHOLDER = 'interrogacion.jpg';
+const PLACEHOLDER = 'interrogacion.png';
 
 const PERK_FILES = [
   'a-place-for-us.png','ace-in-the-hole.png','adrenaline.png','aftercare.png',
