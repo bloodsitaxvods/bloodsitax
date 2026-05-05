@@ -257,6 +257,12 @@ async function mrStartSequence() {
   mrR2.style.transition = "none"; mrR2.style.transform = "translateX(0)"
 
   mrBar1Items = mrBuild(mrR1, mrRoles, 'role')
+
+  // Offset aleatorio de inicio para que no siempre se vea el mismo orden en pantalla
+  const card0  = mrR1.querySelector(".mr-card")
+  const cw0    = card0 ? card0.offsetWidth + 10 : 0
+  const startOffset = Math.floor(Math.random() * mrRoles.length) * cw0
+  mrR1.style.transform = `translateX(-${startOffset}px)`
   const winRole = await mrSpin(mrR1, mrW1, mrBar1Items, 8000)
 
   mrDoFlash(winRole.color)

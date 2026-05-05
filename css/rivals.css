@@ -22,8 +22,8 @@
   position: relative;
   overflow: hidden;
   min-height: 500px;
-  background: transparent;   /* ← pétalos visibles */
-  padding: 28px 20px 40px;
+  background: transparent;
+  padding: 8px 20px 40px;   /* ← menos espacio arriba */
 }
 
 /* ── Sin ::before para no bloquear el canvas ─────────── */
@@ -94,7 +94,7 @@
 #rivals .mr-bar-label {
   font-family: var(--mr-body); font-weight: 700;
   font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
-  color: var(--mr-muted); margin-bottom: 7px;
+  color: var(--mr-muted); margin-bottom: 4px;
   transition: color 0.4s;
 }
 
