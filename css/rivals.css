@@ -1,0 +1,352 @@
+/* ══════════════════════════════════════════════════════
+   MARVEL RIVALS RANDOMIZER — css/rivals.css
+══════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap');
+
+/* ── Variables ──────────────────────────────────────── */
+#rivals {
+  --mr-pink:      #FF2D9A;
+  --mr-pink-dim:  #8A003F;
+  --mr-pink-glow: rgba(255,45,154,0.4);
+  --mr-card-bg:   rgba(18, 0, 13, 0.75);
+  --mr-card-bdr:  #4a0030;
+  --mr-white:     #fff0f7;
+  --mr-muted:     rgba(255,193,225,0.55);
+  --mr-head:      'Bebas Neue', sans-serif;
+  --mr-body:      'Rajdhani', sans-serif;
+}
+
+/* ── Sección — fondo transparente para ver pétalos ───── */
+#rivals {
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  background: transparent;
+  padding: 8px 20px 40px;   /* ← menos espacio arriba */
+}
+
+/* ── Sin ::before para no bloquear el canvas ─────────── */
+#rivals::before { display: none; }
+
+/* ── Scanlines ───────────────────────────────────────── */
+#rivals .mr-scanlines {
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+  );
+  pointer-events: none; z-index: 1; opacity: 0.35;
+}
+
+/* ── Flash overlay ───────────────────────────────────── */
+#rivals .mr-flash {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  z-index: 50; mix-blend-mode: screen;
+}
+#rivals .mr-flash.mr-flash-active {
+  animation: mrFlash 0.9s ease-out forwards;
+}
+@keyframes mrFlash {
+  0%   { opacity: 0; }
+  18%  { opacity: 0.32; }
+  55%  { opacity: 0.16; }
+  100% { opacity: 0; }
+}
+
+/* ── Sparkles ────────────────────────────────────────── */
+#rivals .mr-sparkles {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 51; overflow: hidden;
+}
+#rivals .mr-sparkle { position: absolute; border-radius: 50%; }
+@keyframes mrSparkle {
+  0%   { transform: translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%,-50%) rotate(var(--angle)) translateX(var(--dist)) scale(0); opacity: 0; }
+}
+
+/* ── Partículas (decorativas dentro del section) ─────── */
+#rivals .mr-particles {
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0; overflow: hidden;
+}
+#rivals .mr-particle {
+  position: absolute; border-radius: 50%;
+  background: var(--mr-pink);
+  animation: mrFloat linear infinite;
+}
+@keyframes mrFloat {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  10%  { opacity: 0.4; }
+  90%  { opacity: 0.15; }
+  100% { transform: translateY(-60px) scale(0.4); opacity: 0; }
+}
+
+/* ── Inner container ─────────────────────────────────── */
+#rivals .mr-wrap {
+  position: relative; z-index: 2;
+  max-width: 940px; margin: 0 auto;
+}
+
+/* ── Bar label ───────────────────────────────────────── */
+#rivals .mr-bar-label {
+  font-family: var(--mr-body); font-weight: 700;
+  font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--mr-muted); margin-bottom: 4px;
+  transition: color 0.4s;
+}
+
+/* ── Bars container ──────────────────────────────────── */
+#rivals .mr-bars { position: relative; margin-bottom: 6px; }
+
+/* ── Roulette section ────────────────────────────────── */
+#rivals .mr-section { margin-bottom: 18px; }
+#rivals .mr-hidden  { display: none; }
+#rivals .mr-reveal  {
+  display: block;
+  animation: mrReveal 0.5s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes mrReveal {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Roulette wrapper — glassmorphism como la página ─── */
+#rivals .mr-wrapper {
+  overflow: hidden;
+  border-top: 1px solid rgba(255,45,154,0.35);
+  border-bottom: 1px solid rgba(255,45,154,0.35);
+  height: 190px; position: relative;
+  background: linear-gradient(
+    to bottom,
+    rgba(12,0,9,0.82),
+    rgba(26,0,16,0.88),
+    rgba(12,0,9,0.82)
+  );
+  
+  box-shadow:
+    0 0 30px rgba(255,45,154,0.1) inset,
+    0 0 1px rgba(255,45,154,0.3) inset;
+}
+
+/* ── Glow edges ──────────────────────────────────────── */
+#rivals .mr-edge {
+  position: absolute; top: 0; bottom: 0;
+  width: 140px; z-index: 5; pointer-events: none;
+}
+#rivals .mr-edge.left  { left:  0; background: linear-gradient(to right, rgba(12,0,9,0.95), transparent); }
+#rivals .mr-edge.right { right: 0; background: linear-gradient(to left,  rgba(12,0,9,0.95), transparent); }
+
+/* ── Pointer ─────────────────────────────────────────── */
+#rivals .mr-pointer {
+  position: absolute; top: 0; left: 50%;
+  transform: translateX(-50%);
+  z-index: 10; display: flex; flex-direction: column; align-items: center;
+}
+#rivals .mr-pointer::before {
+  content: ''; display: block; width: 0; height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 16px solid var(--mr-pink);
+  filter: drop-shadow(0 0 6px var(--mr-pink));
+}
+#rivals .mr-ptr-line {
+  width: 2px; height: 190px;
+  background: linear-gradient(to bottom, var(--mr-pink) 0%, transparent 80%);
+  opacity: 0.45;
+}
+
+/* ── Roulette track ──────────────────────────────────── */
+#rivals .mr-roulette {
+  display: flex; align-items: center;
+  height: 100%; padding: 0 6px;
+  will-change: transform;
+  contain: layout style;
+}
+
+/* ── Cards ───────────────────────────────────────────── */
+#rivals .mr-card {
+  flex-shrink: 0; margin: 0 5px;
+  border-radius: 10px;
+  background: var(--mr-card-bg);
+  border: 1px solid var(--mr-card-bdr);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+#rivals .mr-card-role      { width: 70px;  height: 88px; }   /* mitad exacta de 140×175 */
+#rivals .mr-card-character { width: 125px; height: 170px; }
+
+#rivals .mr-card-img { flex: 1; overflow: hidden; background: rgba(26,0,16,0.6); }
+#rivals .mr-card-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: saturate(0.85) brightness(0.9);
+  transition: filter 0.3s;
+}
+#rivals .mr-card-role .mr-card-img { background: linear-gradient(160deg, rgba(26,0,16,0.8), rgba(18,0,13,0.9)); }
+
+#rivals .mr-card-info {
+  padding: 5px 7px;
+  background: rgba(0,0,0,0.7);
+}
+#rivals .mr-card-role .mr-card-info { text-align: center; padding: 4px 3px; }
+
+#rivals .mr-role-name  { font-family: var(--mr-head); font-size: 9px; letter-spacing: 1px; }
+
+/* Wrapper de roles más pequeño y centrado */
+#rivals #mr-w1 {
+  height: 95px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+/* Línea del pointer ajustada al nuevo alto */
+#rivals #mr-w1 .mr-ptr-line { height: 95px; }
+#rivals .mr-char-name  {
+  font-family: var(--mr-body); font-weight: 700; font-size: 11px;
+  color: var(--mr-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#rivals .mr-char-role  {
+  font-family: var(--mr-body); font-weight: 600;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-top: 1px;
+}
+
+/* ── Card activa ─────────────────────────────────────── */
+#rivals .mr-card.mr-active {
+  border-color: var(--item-color);
+  box-shadow: 0 0 22px var(--item-color), 0 0 5px var(--item-color) inset;
+  transform: scaleY(1.04); z-index: 3;
+}
+#rivals .mr-card.mr-active .mr-card-img img { filter: saturate(1.2) brightness(1.05); }
+
+/* ── Botón GIRAR — igual estilo que la página ────────── */
+#rivals .mr-controls { display: flex; justify-content: center; margin: 24px 0; }
+
+#rivals .mr-spin-btn {
+  border: none; cursor: pointer; padding: 0;
+  font-family: 'Bungee', sans-serif;
+  letter-spacing: 3px; background: transparent;
+}
+#rivals .mr-spin-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+#rivals .mr-spin-inner {
+  display: block;
+  padding: 13px 60px; font-size: 20px;
+  border-radius: 999px;
+  background: var(--mr-pink); color: #000;
+  font-weight: 700;
+  box-shadow:
+    0 0 15px var(--mr-pink),
+    0 0 30px rgba(255,45,154,0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+#rivals .mr-spin-btn:not(:disabled):hover .mr-spin-inner {
+  transform: translateY(-3px);
+  box-shadow: 0 0 25px var(--mr-pink), 0 0 50px rgba(255,45,154,0.6);
+}
+
+/* ── Winner overlay ──────────────────────────────────── */
+#rivals .mr-overlay {
+  position: absolute;
+  inset: -8px -16px;
+  z-index: 30;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(12, 0, 9, 0.88);
+  backdrop-filter: blur(8px);
+  border-radius: 6px;
+  padding: 20px 16px; gap: 16px;
+}
+#rivals .mr-overlay-hidden  { display: none; }
+#rivals .mr-overlay-visible {
+  display: flex;
+  animation: mrOverlayIn 0.45s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes mrOverlayIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Celebration ─────────────────────────────────────── */
+#rivals .mr-celeb {
+  position: absolute; inset: 0;
+  pointer-events: none; overflow: hidden;
+  border-radius: 6px; z-index: 0;
+}
+#rivals .mr-heart {
+  position: absolute; user-select: none;
+  pointer-events: none; z-index: 1; line-height: 1;
+}
+@keyframes mrHeartFloat {
+  0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+  15%  { opacity: 1; transform: translateY(-18px) scale(1); }
+  80%  { opacity: 0.8; }
+  100% { transform: translateY(-200px) translateX(var(--drift)) scale(0.7); opacity: 0; }
+}
+#rivals .mr-glint {
+  position: absolute; border-radius: 50%;
+  pointer-events: none; z-index: 1;
+}
+@keyframes mrGlint {
+  0%   { transform: scale(0); opacity: 0; }
+  40%  { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0);   opacity: 0; }
+}
+
+/* ── Winner modal ────────────────────────────────────── */
+#rivals .mr-modal {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+}
+#rivals .mr-modal-label {
+  font-family: var(--mr-body); font-weight: 700;
+  font-size: 10px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--mr-pink);
+  text-shadow: 0 0 12px var(--mr-pink);
+}
+
+/* ── Winner card ─────────────────────────────────────── */
+#rivals .mr-winner-card {
+  position: relative; width: 200px;
+  border-radius: 18px; overflow: hidden;
+  border: 1px solid var(--mr-pink);
+  box-shadow:
+    0 0 25px rgba(255,45,154,0.4),
+    0 0 50px rgba(255,45,154,0.15);
+  background: rgba(18,0,13,0.9);
+  animation: mrCardPop 0.5s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes mrCardPop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+#rivals .mr-wc-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--role-color) 0%, transparent 65%);
+  opacity: 0.2; pointer-events: none; z-index: 1;
+}
+#rivals .mr-wc-img { height: 220px; overflow: hidden; }
+#rivals .mr-wc-img img {
+  width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;
+  filter: saturate(1.1) brightness(1.02);
+}
+#rivals .mr-wc-body { padding: 8px 11px 11px; position: relative; z-index: 2; }
+#rivals .mr-wc-name {
+  font-family: 'Bungee', sans-serif;
+  font-size: 18px; letter-spacing: 1px; color: #fff;
+  text-shadow: 0 0 12px rgba(255,255,255,0.3);
+}
+#rivals .mr-wc-role {
+  font-family: var(--mr-body); font-weight: 700;
+  font-size: 10px; letter-spacing: 5px; text-transform: uppercase; margin-top: 3px;
+}
+
+/* Ajuste winner card sin nombre — solo rol abajo */
+#rivals .mr-wc-body {
+  padding: 8px 13px 11px;
+}
+#rivals .mr-wc-role {
+  font-size: 11px;
+  letter-spacing: 5px;
+}
