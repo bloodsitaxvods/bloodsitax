@@ -115,10 +115,10 @@ function mrBuild(el, pool, type) {
   el.innerHTML = ""
   const shuffled = mrShuffle(pool)
 
-  // OPTIMIZACIÓN: menos repeticiones = menos DOM nodes
+  // OPTIMIZACIÓN: reps debe ser > loops (loops=4) para que el índice de parada exista
   // Roles: 3 items × 8 reps = 24 cards
-  // Chars: hasta 26 items × 4 reps = ~100 cards (antes eran 260)
-  const reps = type === 'role' ? 8 : 4
+  // Chars: hasta 26 items × 6 reps = ~156 cards (loops=4, siempre dentro del rango)
+  const reps = type === 'role' ? 8 : 6
   const frag = document.createDocumentFragment()
 
   for (let r = 0; r < reps; r++) {
