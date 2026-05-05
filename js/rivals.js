@@ -154,11 +154,17 @@ function mrSpin(rouEl, wrapEl, pool, dur) {
     const cw     = card.offsetWidth + 10
     const center = wrapEl.offsetWidth / 2
     const total  = pool.length
-    const loops  = 4  // ← reducido de 7 a 4 (menos distancia = menos trabajo GPU)
+    const loops  = 5
 
-    const buf = new Uint32Array(1)
-    crypto.getRandomValues(buf)
-    const idx    = buf[0] % total
+    // Rejection sampling — elimina sesgo de módulo
+    const limit = Math.floor(0x100000000 / total) * total
+    let raw
+    do {
+      const buf = new Uint32Array(1)
+      crypto.getRandomValues(buf)
+      raw = buf[0]
+    } while (raw >= limit)
+    const idx    = raw % total
     const offset = (loops * total + idx) * cw - center + cw / 2
 
     rouEl.style.transition = `transform ${dur/1000}s cubic-bezier(.02,.85,.1,1)`
@@ -275,6 +281,7 @@ function mrShowWinner(char) {
     <div class="mr-wc-glow" style="--role-color:${color}"></div>
     <div class="mr-wc-img"><img src="${char.img}" alt="${char.name}" decoding="async"></div>
     <div class="mr-wc-body">
+      <div class="mr-wc-name">${char.name}</div>
       <div class="mr-wc-role" style="color:${color}">${char.role}</div>
     </div>
   `
