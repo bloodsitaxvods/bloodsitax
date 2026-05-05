@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marvel Rivals — Randomizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+<div class="scanlines"></div>
+<div class="flash-overlay" id="flashOverlay"></div>
+<div class="sparkles-container" id="sparklesContainer"></div>
+
+<div class="container">
+
+  <!-- BARRAS + OVERLAY GANADOR -->
+  <div class="bars-container" id="barsContainer">
+
+    <section class="roulette-section" id="section1">
+      <div class="bar-label" id="bar1Label">SELECCIONA ROL</div>
+      <div class="roulette-wrapper" id="wrapper1">
+        <div class="glow-edge left"></div>
+        <div class="glow-edge right"></div>
+        <div class="pointer"><div class="pointer-line"></div></div>
+        <div class="roulette" id="roulette1"></div>
+      </div>
+    </section>
+
+    <section class="roulette-section bar2-hidden" id="section2">
+      <div class="bar-label" id="bar2Label">PERSONAJE</div>
+      <div class="roulette-wrapper" id="wrapper2">
+        <div class="glow-edge left"></div>
+        <div class="glow-edge right"></div>
+        <div class="pointer"><div class="pointer-line"></div></div>
+        <div class="roulette" id="roulette2"></div>
+      </div>
+    </section>
+
+    <!-- Overlay encima de ambas barras -->
+    <div class="winner-overlay" id="winnerOverlay">
+      <div class="celebration-container" id="celebrationContainer"></div>
+      <div class="winner-modal" id="winnerModal">
+        <div class="winner-modal-label">✦ PERSONAJE SELECCIONADO ✦</div>
+        <div class="winner-modal-card" id="winnerCard"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-spin" id="spinBtn" onclick="startSequence()">
+      <span class="btn-inner">GIRAR</span>
+    </button>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

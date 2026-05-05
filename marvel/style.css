@@ -1,0 +1,377 @@
+/* ─── VARIABLES ─────────────────────────────────────────── */
+:root {
+  --pink:      #ff1a6e;
+  --pink-dim:  #c0124e;
+  --pink-glow: rgba(255,26,110,0.35);
+  --bg:        #080810;
+  --bg2:       #0f0f1a;
+  --card-bg:   #111120;
+  --card-bdr:  #2a2a40;
+  --white:     #f0f0ff;
+  --muted:     #6060a0;
+  --font-head: 'Bebas Neue', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(255,26,110,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 100%, rgba(0,120,255,0.05) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── SCANLINES ─────────────────────────────────────────── */
+.scanlines {
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
+  );
+  pointer-events: none; z-index: 1; opacity: 0.5;
+}
+
+/* ─── PARTICLES ─────────────────────────────────────────── */
+.particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.particle {
+  position: absolute; border-radius: 50%;
+  background: var(--pink);
+  animation: float linear infinite;
+}
+@keyframes float {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  10%  { opacity: 0.5; }
+  90%  { opacity: 0.2; }
+  100% { transform: translateY(-80px) scale(0.4); opacity: 0; }
+}
+
+/* ─── FLASH OVERLAY (duración doble: 0.9s) ──────────────── */
+.flash-overlay {
+  position: fixed; inset: 0;
+  opacity: 0; pointer-events: none;
+  z-index: 100; mix-blend-mode: screen;
+}
+.flash-overlay.flash-active {
+  animation: flashPulse 0.9s ease-out forwards;
+}
+@keyframes flashPulse {
+  0%   { opacity: 0; }
+  18%  { opacity: 0.30; }
+  55%  { opacity: 0.18; }
+  100% { opacity: 0; }
+}
+
+/* ─── SPARKLES ───────────────────────────────────────────── */
+.sparkles-container { position: fixed; inset: 0; pointer-events: none; z-index: 101; overflow: hidden; }
+.sparkle { position: absolute; border-radius: 50%; }
+@keyframes sparkle-burst {
+  0%   { transform: translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(1); opacity: 1; }
+  100% { transform: translate(-50%,-50%) rotate(var(--angle)) translateX(var(--dist)) scale(0); opacity: 0; }
+}
+
+/* ─── CONTAINER ─────────────────────────────────────────── */
+.container {
+  position: relative; z-index: 2;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+}
+
+/* ─── HEADER ─────────────────────────────────────────────── */
+.site-header { text-align: center; margin-bottom: 44px; }
+
+.logo-tag {
+  display: inline-block;
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 11px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--pink);
+  border: 1px solid var(--pink-dim);
+  padding: 4px 14px; border-radius: 2px; margin-bottom: 10px;
+  box-shadow: 0 0 10px var(--pink-glow);
+}
+
+.title {
+  font-family: var(--font-head);
+  font-size: clamp(52px, 10vw, 90px);
+  letter-spacing: 6px; line-height: 1;
+  text-shadow: 0 0 20px rgba(255,255,255,0.25), 0 0 60px var(--pink-glow);
+}
+
+.subtitle {
+  font-size: 13px; letter-spacing: 3px; color: var(--muted);
+  text-transform: uppercase; margin-top: 8px;
+}
+
+/* ─── BARS CONTAINER ─────────────────────────────────────── */
+/* Posición relativa para que el overlay se posicione sobre las barras */
+.bars-container {
+  position: relative;
+  margin-bottom: 4px;
+}
+
+/* ─── ROULETTE SECTION ───────────────────────────────────── */
+.roulette-section { margin-bottom: 20px; }
+
+.bar2-hidden  { display: none; }
+.bar2-reveal  {
+  display: block;
+  animation: sectionReveal 0.5s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes sectionReveal {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── BAR LABEL ──────────────────────────────────────────── */
+.bar-label {
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px; padding-left: 2px;
+  transition: color 0.4s;
+}
+
+/* ─── WRAPPER ────────────────────────────────────────────── */
+.roulette-wrapper {
+  overflow: hidden;
+  border-top: 1px solid rgba(255,26,110,0.35);
+  border-bottom: 1px solid rgba(255,26,110,0.35);
+  height: 200px; position: relative;
+  background: linear-gradient(to bottom, #08080f, #0d0d1c, #08080f);
+  box-shadow: 0 0 40px rgba(255,26,110,0.12) inset;
+}
+
+.glow-edge { position: absolute; top: 0; bottom: 0; width: 150px; z-index: 5; pointer-events: none; }
+.glow-edge.left  { left:  0; background: linear-gradient(to right, var(--bg), transparent); }
+.glow-edge.right { right: 0; background: linear-gradient(to left,  var(--bg), transparent); }
+
+/* ─── POINTER ────────────────────────────────────────────── */
+.pointer {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  z-index: 10; display: flex; flex-direction: column; align-items: center;
+}
+.pointer::before {
+  content: ''; display: block;
+  width: 0; height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 18px solid var(--pink);
+  filter: drop-shadow(0 0 6px var(--pink));
+}
+.pointer-line {
+  width: 2px; height: 200px;
+  background: linear-gradient(to bottom, var(--pink) 0%, transparent 80%);
+  opacity: 0.45;
+}
+
+/* ─── ROULETTE TRACK ─────────────────────────────────────── */
+.roulette {
+  display: flex; align-items: center;
+  height: 100%; padding: 0 6px;
+  will-change: transform;
+}
+
+/* ─── CARD BASE ──────────────────────────────────────────── */
+.card {
+  flex-shrink: 0; margin: 0 5px;
+  border-radius: 10px; background: var(--card-bg);
+  border: 1px solid var(--card-bdr);
+  display: flex; flex-direction: column; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  position: relative;
+}
+.card-role      { width: 150px; height: 184px; }
+.card-character { width: 130px; height: 178px; }
+
+.card-img-wrap { flex: 1; overflow: hidden; background: #0a0a18; }
+.card-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: saturate(0.8) brightness(0.88);
+  transition: filter 0.3s;
+}
+
+.card-role .card-img-wrap { background: linear-gradient(160deg, #0d0d20, #0a0a16); }
+
+.card-info { padding: 6px 8px; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); }
+.card-role .card-info { text-align: center; padding: 8px 6px; }
+
+.card-role-name  { font-family: var(--font-head); font-size: 17px; letter-spacing: 2px; }
+.card-name       { font-family: var(--font-body); font-weight: 700; font-size: 12px; letter-spacing: 0.4px; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-role-badge { font-family: var(--font-body); font-weight: 600; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-top: 1px; }
+
+.card.active {
+  border-color: var(--item-color);
+  box-shadow: 0 0 22px var(--item-color), 0 0 6px var(--item-color) inset;
+  transform: scaleY(1.04); z-index: 3;
+}
+.card.active .card-img-wrap img { filter: saturate(1.2) brightness(1.05); }
+
+/* ─── CONTROLS ───────────────────────────────────────────── */
+.controls { display: flex; justify-content: center; margin: 28px 0; }
+
+/* ─── BUTTONS ────────────────────────────────────────────── */
+.btn {
+  border: none; background: transparent;
+  cursor: pointer; padding: 0;
+  font-family: var(--font-head); letter-spacing: 2px;
+}
+.btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+.btn-inner {
+  display: block; border-radius: 6px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-spin .btn-inner {
+  padding: 14px 48px; font-size: 22px;
+  background: var(--pink); color: #fff;
+  box-shadow: 0 0 22px var(--pink-glow), 0 0 6px var(--pink-glow) inset;
+}
+.btn-spin:not(:disabled):hover .btn-inner {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(255,26,110,0.55), 0 0 14px var(--pink-glow) inset;
+}
+
+.btn-reset-big .btn-inner {
+  padding: 11px 36px; font-size: 18px;
+  background: rgba(255,255,255,0.06);
+  color: var(--white);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+}
+.btn-reset-big:hover .btn-inner {
+  transform: translateY(-2px);
+  background: rgba(255,255,255,0.12);
+  border-color: var(--pink);
+  box-shadow: 0 0 16px var(--pink-glow);
+}
+
+/* ─── WINNER OVERLAY ─────────────────────────────────────── */
+/* Se posiciona encima del bars-container */
+.winner-overlay {
+  position: absolute;
+  inset: -10px -20px;          /* un poco más que el container para cubrirlo todo */
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(8, 8, 18, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 8px;
+  padding: 24px 16px;
+  gap: 20px;
+}
+
+.overlay-hidden  { display: none; }
+.overlay-visible {
+  display: flex;
+  animation: overlayIn 0.45s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes overlayIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ─── CELEBRATION ────────────────────────────────────────── */
+.celebration-container {
+  position: absolute; inset: 0;
+  pointer-events: none; overflow: hidden;
+  border-radius: 8px;
+  z-index: 0;
+}
+
+.celeb-heart {
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
+  line-height: 1;
+}
+@keyframes heartFloat {
+  0%   { transform: translateY(0) translateX(0) scale(0.6); opacity: 0; }
+  15%  { opacity: 1; transform: translateY(-20px) translateX(0) scale(1); }
+  80%  { opacity: 0.8; }
+  100% { transform: translateY(-220px) translateX(var(--drift)) scale(0.7); opacity: 0; }
+}
+
+.celeb-glint {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes glintPop {
+  0%   { transform: scale(0); opacity: 0; }
+  40%  { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0);   opacity: 0; }
+}
+
+/* ─── WINNER MODAL (card dentro del overlay) ─────────────── */
+.winner-modal {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 18px;
+}
+
+.winner-modal-label {
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 11px; letter-spacing: 6px; text-transform: uppercase;
+  color: var(--pink);
+  text-shadow: 0 0 14px var(--pink);
+}
+
+/* ─── WINNER CARD ────────────────────────────────────────── */
+.winner-modal-card {
+  position: relative;
+  width: 250px; border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--pink);
+  box-shadow: 0 0 40px var(--pink-glow), 0 0 80px rgba(255,26,110,0.08);
+  background: var(--card-bg);
+  animation: cardPop 0.5s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes cardPop {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.wc-glow {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--role-color) 0%, transparent 65%);
+  opacity: 0.2; pointer-events: none; z-index: 1;
+}
+.wc-img { height: 310px; overflow: hidden; }
+.wc-img img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  filter: saturate(1.1) brightness(1.02);
+}
+.wc-body { padding: 12px 14px 14px; position: relative; z-index: 2; }
+.wc-name {
+  font-family: var(--font-head);
+  font-size: 32px; letter-spacing: 2px;
+}
+.wc-role {
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 11px; letter-spacing: 4px;
+  text-transform: uppercase; margin-top: 2px;
+}
+
+/* ─── SCROLLBAR ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--pink-dim); border-radius: 3px; }
