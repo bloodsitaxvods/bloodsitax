@@ -4,7 +4,7 @@
 
 ;(function() {
 
-const IMG = "img/marvel"
+const IMG = "marvel/img/marvel"
 
 // ── ROLES ─────────────────────────────────────────────
 const mrRoles = [
