@@ -174,9 +174,8 @@
   border: 1px solid var(--mr-card-bdr);
   display: flex; flex-direction: column; overflow: hidden;
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-  
 }
-#rivals .mr-card-role      { width: 140px; height: 175px; }
+#rivals .mr-card-role      { width: 70px;  height: 88px; }   /* mitad exacta de 140×175 */
 #rivals .mr-card-character { width: 125px; height: 170px; }
 
 #rivals .mr-card-img { flex: 1; overflow: hidden; background: rgba(26,0,16,0.6); }
@@ -190,11 +189,19 @@
 #rivals .mr-card-info {
   padding: 5px 7px;
   background: rgba(0,0,0,0.7);
-  
 }
-#rivals .mr-card-role .mr-card-info { text-align: center; padding: 7px 5px; }
+#rivals .mr-card-role .mr-card-info { text-align: center; padding: 4px 3px; }
 
-#rivals .mr-role-name  { font-family: var(--mr-head); font-size: 15px; letter-spacing: 2px; }
+#rivals .mr-role-name  { font-family: var(--mr-head); font-size: 9px; letter-spacing: 1px; }
+
+/* Wrapper de roles más pequeño y centrado */
+#rivals #mr-w1 {
+  height: 95px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+/* Línea del pointer ajustada al nuevo alto */
+#rivals #mr-w1 .mr-ptr-line { height: 95px; }
 #rivals .mr-char-name  {
   font-family: var(--mr-body); font-weight: 700; font-size: 11px;
   color: var(--mr-white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
