@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/killer.css">
 <link rel="stylesheet" href="css/survivor.css">
 <link rel="stylesheet" href="css/ruleta.css">
+<link rel="stylesheet" href="css/rivals.css">
 </head>
 <body>
   <canvas id="sakura-canvas"></canvas>
@@ -197,15 +198,59 @@
 
       <!-- ===== MARVEL RIVALS ===== -->
       <section class="section" id="rivals">
-        <div class="placeholder">
-          <div class="ph-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M13 2L4 14h6l-1 8 10-13h-7l1-7z"/>
-            </svg>
+
+        <!-- Efectos de fondo -->
+        <div class="mr-scanlines"></div>
+        <div class="mr-flash" id="mr-flash"></div>
+        <div class="mr-sparkles" id="mr-sparks"></div>
+        <div class="mr-particles" id="mr-particles"></div>
+
+        <div class="mr-wrap">
+
+          <!-- Barras + overlay -->
+          <div class="mr-bars" id="mr-bars">
+
+            <!-- Barra 1: Roles -->
+            <div class="mr-section" id="mr-sec1">
+              <div class="mr-bar-label" id="mr-lbl1">SELECCIONA ROL</div>
+              <div class="mr-wrapper" id="mr-w1">
+                <div class="mr-edge left"></div>
+                <div class="mr-edge right"></div>
+                <div class="mr-pointer"><div class="mr-ptr-line"></div></div>
+                <div class="mr-roulette" id="mr-r1"></div>
+              </div>
+            </div>
+
+            <!-- Barra 2: Personajes (oculta al inicio) -->
+            <div class="mr-section mr-hidden" id="mr-sec2">
+              <div class="mr-bar-label" id="mr-lbl2">PERSONAJE</div>
+              <div class="mr-wrapper" id="mr-w2">
+                <div class="mr-edge left"></div>
+                <div class="mr-edge right"></div>
+                <div class="mr-pointer"><div class="mr-ptr-line"></div></div>
+                <div class="mr-roulette" id="mr-r2"></div>
+              </div>
+            </div>
+
+            <!-- Overlay ganador -->
+            <div class="mr-overlay" id="mr-overlay">
+              <div class="mr-celeb" id="mr-celeb"></div>
+              <div class="mr-modal">
+                <div class="mr-modal-label">✦ PERSONAJE SELECCIONADO ✦</div>
+                <div class="mr-winner-card" id="mr-win-card"></div>
+              </div>
+            </div>
+
+          </div><!-- /mr-bars -->
+
+          <!-- Botón -->
+          <div class="mr-controls">
+            <button class="mr-spin-btn" id="mr-spin-btn">
+              <span class="mr-spin-inner">GIRAR</span>
+            </button>
           </div>
-          <h3>MARVEL RIVALS</h3>
-          <p>Próximamente — randomizer de heroes de Marvel Rivals.</p>
-        </div>
+
+        </div><!-- /mr-wrap -->
       </section>
 
       <!-- ===== RULETA ===== -->
@@ -337,5 +382,6 @@
   <script src="js/killer.js"></script>
   <script src="js/survivor.js"></script>
   <script src="js/ruleta.js"></script>
+  <script src="js/rivals.js"></script>
 </body>
 </html>
