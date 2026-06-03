@@ -254,7 +254,7 @@ body::before {
 }
 
 .big-btn:hover {
-  transform: translateY(-5px);
+  transform: scale(1.02);
   border-color: var(--neon-pink);
   box-shadow:
     0 0 25px rgba(255, 45, 154, 0.4),
