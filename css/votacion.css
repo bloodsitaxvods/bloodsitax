@@ -105,15 +105,16 @@
 }
 
 /* GANADOR */
+.vk-crown { display: none; }   /* corona quitada: el amarillo + glow ya marcan al ganador */
 .vk-card.winner .vk-frame {
   border-color: var(--gold);
-  box-shadow: 0 0 24px var(--gold), inset 0 0 26px rgba(255,210,74,.28);
+  box-shadow: 0 0 42px var(--gold), 0 0 78px rgba(255,210,74,.65), inset 0 0 46px rgba(255,210,74,.45);
   animation: vkWin 1s ease-in-out infinite;
 }
 @keyframes vkWin { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.03)} }
-.vk-card.winner .vk-pct { color: var(--gold); text-shadow: 0 0 12px var(--gold), 0 0 28px var(--gold); }
-.vk-card.winner .vk-letter { border-color: var(--gold); box-shadow: 0 0 14px var(--gold); color: var(--gold); text-shadow: 0 0 8px var(--gold); }
-.vk-card.winner .vk-name { border-color: var(--gold); color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+.vk-card.winner .vk-pct { color: var(--gold); text-shadow: 0 0 21px var(--gold), 0 0 49px var(--gold), 0 0 70px rgba(255,210,74,.6); }
+.vk-card.winner .vk-letter { border-color: var(--gold); box-shadow: 0 0 24px var(--gold), 0 0 44px rgba(255,210,74,.6); color: var(--gold); text-shadow: 0 0 14px var(--gold); }
+.vk-card.winner .vk-name { border-color: var(--gold); color: var(--gold); text-shadow: 0 0 17px var(--gold); box-shadow: 0 0 22px rgba(255,210,74,.5); }
 .vk-card.dim { opacity: .5; filter: grayscale(.35); }
 
 /* ─────────── controles ─────────── */
@@ -124,7 +125,7 @@
   cursor: pointer; transition: all .3s cubic-bezier(.4,0,.2,1);
   box-shadow: 0 0 15px var(--neon-pink), 0 0 30px rgba(255,45,154,.5);
 }
-.vk-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 0 30px var(--neon-pink), 0 0 60px rgba(255,45,154,.55); }
+.vk-btn:hover:not(:disabled) { transform: scale(1.04); box-shadow: 0 0 30px var(--neon-pink), 0 0 60px rgba(255,45,154,.55); }
 .vk-btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.4); box-shadow: none; }
 
 .vk-timer { display: none; align-items: center; gap: 8px; }
