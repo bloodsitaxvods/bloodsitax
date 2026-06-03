@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/survivor.css">
 <link rel="stylesheet" href="css/ruleta.css">
 <link rel="stylesheet" href="css/rivals.css">
+<link rel="stylesheet" href="css/votacion.css">
 </head>
 <body>
   <canvas id="sakura-canvas"></canvas>
@@ -26,6 +27,7 @@
 
     <nav class="tabs">
       <button class="tab active" data-tab="home">Inicio</button>
+      <button class="tab" data-tab="votacion">Votación Killer</button>
       <button class="tab" data-tab="killer">Killer</button>
       <button class="tab" data-tab="survivor">Survivor</button>
       <button class="tab" data-tab="rivals">Marvel Rivals</button>
@@ -37,6 +39,15 @@
       <!-- ===== HOME ===== -->
       <section class="section active" id="home">
         <div class="button-grid">
+
+          <button class="big-btn" data-goto="votacion">
+            <div class="icon-wrap" style="width:56px;height:56px;">
+              <img src="logo_votacion_killer.png" alt="Votación Killer" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">
+            </div>
+            <h2>Votación Killer</h2>
+            <p class="desc">Dead by Daylight · El chat elige al killer</p>
+            <span class="action">Votar ahora <span class="arrow">→</span></span>
+          </button>
 
           <button class="big-btn" data-goto="killer">
             <div class="icon-wrap" style="width:56px;height:56px;">
@@ -74,6 +85,34 @@
             <span class="action">Girar ahora <span class="arrow">→</span></span>
           </button>
 
+        </div>
+      </section>
+
+      <!-- ===== VOTACION KILLER ===== -->
+      <section class="section" id="votacion">
+        <div class="vk-wrap">
+          <div class="section-label">✦&nbsp; Votación Killer &nbsp;✦</div>
+          <div class="vk-sub">El chat elige · 4 killers al azar · vota con A B C D</div>
+          <div class="vk-layout">
+            <div class="vk-main">
+              <div class="vk-cards" id="vkCards"></div>
+              <div class="vk-controls">
+                <button class="vk-btn" id="vkRollBtn">🎲 Rolear killers</button>
+                <button class="vk-btn" id="vkVoteBtn" disabled>🗳️ Iniciar votación</button>
+                <div class="vk-timer" id="vkTimerWrap"><span id="vkTimer">20</span><small>SEG</small></div>
+              </div>
+              <div class="vk-result" id="vkResult"></div>
+            </div>
+            <aside class="vk-chat">
+              <div class="vk-chat-head">
+                <span class="vk-head-l"><span class="vk-dot" id="vkDot"></span> CHAT · bloodsitax</span>
+                <span class="vk-votecount" id="vkVoteCount"></span>
+              </div>
+              <div class="vk-chat-box" id="vkChatBox">
+                <div class="vk-msg"><b style="color:var(--neon-pink)">BloodSitaX</b> ¡Vota con A, B, C o D! 🩸</div>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
 
@@ -379,6 +418,7 @@
 
   <!-- Scripts en orden -->
   <script src="js/main.js"></script>
+  <script src="js/votacion.js"></script>
   <script src="js/killer.js"></script>
   <script src="js/survivor.js"></script>
   <script src="js/ruleta.js"></script>
