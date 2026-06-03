@@ -1,0 +1,186 @@
+/* ============================================================
+   BLOODSITAX — votacion.css
+   Estilos de la sección "Votación Killer" (scoped a #votacion)
+   ============================================================ */
+#votacion {
+  --gold: #ffd24a;
+}
+
+.vk-wrap { max-width: 1080px; margin: 0 auto; padding: 6px 0 40px; }
+
+/* etiqueta de sección (igual que las otras herramientas) */
+#votacion .section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.05rem; letter-spacing: .6em;
+  color: var(--neon-pink); text-align: center; margin-bottom: 6px;
+  text-shadow: 0 0 6px var(--neon-pink), 0 0 18px var(--hot-pink), 0 0 38px var(--deep-magenta);
+}
+.vk-sub {
+  text-align: center; color: var(--bright-pink); opacity: .8;
+  font-size: .8rem; letter-spacing: 2px; margin-bottom: 22px; text-transform: uppercase;
+}
+
+/* layout: tarjetas | chat */
+.vk-layout {
+  display: grid; grid-template-columns: 1fr 320px; gap: 26px; align-items: start;
+}
+
+/* ─────────── tarjetas ─────────── */
+.vk-cards { display: flex; gap: 18px; justify-content: center; align-items: flex-end; flex-wrap: wrap; }
+
+.vk-card {
+  position: relative; width: 172px;
+  opacity: 0; transform: translateY(24px) scale(.92);
+  transition: opacity .45s ease, transform .55s cubic-bezier(.2,1.2,.3,1);
+}
+.vk-card.show { opacity: 1; transform: translateY(0) scale(1); }
+
+.vk-crown {
+  position: absolute; top: -56px; left: 50%; transform: translateX(-50%) scale(0);
+  font-size: 28px; opacity: 0; z-index: 6; transition: transform .5s cubic-bezier(.2,1.6,.3,1);
+  filter: drop-shadow(0 0 10px var(--gold));
+}
+.vk-card.winner .vk-crown { transform: translateX(-50%) scale(1); opacity: 1; }
+
+.vk-pct {
+  position: absolute; top: -44px; left: 50%; transform: translateX(-50%) scale(.6);
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 26px;
+  color: #fff; text-shadow: 0 0 10px var(--hot-pink), 0 0 24px var(--hot-pink);
+  opacity: 0; transition: opacity .4s ease, transform .4s cubic-bezier(.2,1.4,.3,1); pointer-events: none;
+}
+.vk-card.voting .vk-pct, .vk-card.results .vk-pct { opacity: 1; transform: translateX(-50%) scale(1); }
+
+.vk-letter {
+  position: absolute; top: -14px; left: -14px; z-index: 5;
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 22px; color: #fff;
+  background: radial-gradient(circle at 35% 30%, #2a0018, #11000b);
+  border: 2px solid var(--hot-pink);
+  box-shadow: 0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5);
+  text-shadow: 0 0 8px var(--hot-pink);
+}
+
+.vk-frame {
+  position: relative; height: 230px; border-radius: 16px; overflow: hidden;
+  background: linear-gradient(135deg, var(--almost-black), var(--dark-purple));
+  border: 1px solid var(--deep-magenta);
+  box-shadow: 0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12);
+  animation: vkBreathe 3.4s ease-in-out infinite;
+}
+@keyframes vkBreathe {
+  0%,100% { box-shadow: 0 0 10px rgba(255,45,154,.3), inset 0 0 16px rgba(255,45,154,.10); }
+  50%     { box-shadow: 0 0 20px rgba(255,45,154,.7), inset 0 0 24px rgba(255,45,154,.22); }
+}
+.vk-portrait {
+  width: 100%; height: 100%;
+  background-size: cover; background-position: center top; background-repeat: no-repeat;
+}
+.vk-portrait.spinning { animation: vkRoll .2s steps(2) infinite; }
+@keyframes vkRoll { 0%{filter:brightness(1)} 50%{filter:brightness(1.3) hue-rotate(12deg)} }
+.vk-frame::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to bottom, transparent 60%, #0A0005 100%);
+}
+
+.vk-name {
+  margin-top: 10px; text-align: center;
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .05em; color: #fff;
+  padding: 7px 6px; border: 1px solid var(--deep-magenta); border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,45,154,.08), rgba(255,45,154,.02));
+  text-shadow: 0 0 6px rgba(255,45,154,.4);
+  min-height: 38px; display: flex; align-items: center; justify-content: center;
+}
+
+.vk-bar {
+  height: 8px; border-radius: 6px; margin-top: 7px; overflow: hidden;
+  background: rgba(255,45,154,.12); border: 1px solid rgba(255,45,154,.32);
+  opacity: 0; transition: opacity .35s ease;
+}
+.vk-card.voting .vk-bar, .vk-card.results .vk-bar { opacity: 1; }
+.vk-bar > i {
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--deep-magenta), var(--hot-pink), var(--neon-pink));
+  box-shadow: 0 0 10px var(--hot-pink);
+  transition: width .5s cubic-bezier(.2,.8,.2,1);
+}
+
+/* GANADOR */
+.vk-card.winner .vk-frame {
+  border-color: var(--gold);
+  box-shadow: 0 0 24px var(--gold), inset 0 0 26px rgba(255,210,74,.28);
+  animation: vkWin 1s ease-in-out infinite;
+}
+@keyframes vkWin { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.03)} }
+.vk-card.winner .vk-pct { color: var(--gold); text-shadow: 0 0 12px var(--gold), 0 0 28px var(--gold); }
+.vk-card.winner .vk-letter { border-color: var(--gold); box-shadow: 0 0 14px var(--gold); color: var(--gold); text-shadow: 0 0 8px var(--gold); }
+.vk-card.winner .vk-name { border-color: var(--gold); color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+.vk-card.dim { opacity: .5; filter: grayscale(.35); }
+
+/* ─────────── controles ─────────── */
+.vk-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 28px; flex-wrap: wrap; }
+.vk-btn {
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: .18em;
+  color: #000; background: var(--neon-pink); border: none; padding: 12px 34px; border-radius: 999px;
+  cursor: pointer; transition: all .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 0 15px var(--neon-pink), 0 0 30px rgba(255,45,154,.5);
+}
+.vk-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 0 30px var(--neon-pink), 0 0 60px rgba(255,45,154,.55); }
+.vk-btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.4); box-shadow: none; }
+
+.vk-timer { display: none; align-items: center; gap: 8px; }
+.vk-timer.on { display: flex; }
+.vk-timer #vkTimer {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 38px; color: #fff; min-width: 64px; text-align: center;
+  text-shadow: 0 0 12px var(--hot-pink), 0 0 28px var(--hot-pink);
+}
+.vk-timer #vkTimer.low { color: #ff3b3b; text-shadow: 0 0 14px #ff3b3b, 0 0 30px #ff3b3b; animation: vkTick .5s ease-in-out infinite; }
+@keyframes vkTick { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+.vk-timer small { font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 2px; color: var(--bright-pink); }
+
+.vk-result {
+  margin-top: 20px; min-height: 30px; text-align: center;
+  font-family: 'Bungee', sans-serif; font-size: 1.2rem; letter-spacing: 1px; color: #fff;
+  opacity: 0; transform: translateY(8px); transition: opacity .5s ease, transform .5s ease;
+}
+.vk-result.on { opacity: 1; transform: translateY(0); }
+.vk-result .g { color: var(--gold); text-shadow: 0 0 12px var(--gold), 0 0 28px var(--gold); }
+
+/* ─────────── chat ─────────── */
+.vk-chat {
+  border: 1px solid var(--deep-magenta); border-radius: 16px; overflow: hidden;
+  background: linear-gradient(180deg, rgba(26,0,16,.7), rgba(10,0,8,.7));
+  box-shadow: 0 0 14px rgba(255,45,154,.25), inset 0 0 20px rgba(255,45,154,.06);
+  display: flex; flex-direction: column; height: 360px;
+}
+.vk-chat-head {
+  padding: 11px 14px; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 12px;
+  letter-spacing: 2px; text-transform: uppercase; color: #fff; text-shadow: 0 0 8px var(--hot-pink);
+  border-bottom: 1px solid rgba(255,45,154,.4); display: flex; align-items: center; justify-content: space-between;
+}
+.vk-head-l { display: flex; align-items: center; gap: 8px; }
+.vk-dot { width: 9px; height: 9px; border-radius: 50%; background: #5a5a5a; transition: background .3s; }
+.vk-dot.ready { background: #00e676; box-shadow: 0 0 10px #00e676; }     /* conectado al chat */
+.vk-dot.live  { background: var(--hot-pink); box-shadow: 0 0 10px var(--hot-pink); animation: vkBlink 1.4s ease-in-out infinite; } /* votación activa */
+@keyframes vkBlink { 0%,100%{opacity:1} 50%{opacity:.35} }
+.vk-votecount { font-size: 11px; color: var(--neon-pink); letter-spacing: 1px; }
+
+.vk-chat-box { flex: 1; overflow-y: auto; padding: 11px 13px; display: flex; flex-direction: column; gap: 8px; }
+.vk-msg { font-family: 'Rajdhani', sans-serif; font-size: 15px; font-weight: 500; line-height: 1.25; color: #f3dbe8; word-break: break-word; }
+.vk-msg b { font-weight: 700; }
+.vk-msg.vote { padding: 4px 8px; border-radius: 8px; background: rgba(255,45,154,.12); border: 1px solid rgba(255,45,154,.4); }
+.vk-badge {
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 11px; margin-left: 6px;
+  padding: 1px 7px; border-radius: 6px; background: var(--hot-pink); color: #12000b; box-shadow: 0 0 8px var(--hot-pink);
+}
+.vk-chat-box::-webkit-scrollbar { width: 6px; }
+.vk-chat-box::-webkit-scrollbar-thumb { background: rgba(255,45,154,.5); border-radius: 3px; }
+
+/* ─────────── responsive ─────────── */
+@media (max-width: 860px) {
+  .vk-layout { grid-template-columns: 1fr; }
+  .vk-chat { height: 300px; }
+}
+@media (max-width: 560px) {
+  .vk-card { width: 140px; }
+  .vk-frame { height: 188px; }
+}
