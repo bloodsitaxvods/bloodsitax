@@ -270,12 +270,72 @@ function resetResults(){
   voteCountEl.textContent = '';
 }
 
+/* ───────────────── EMOTES (Twitch + 7TV) ───────────────── */
+const sevenTV = {};                              // nombre de emote -> URL de imagen
+let globalSevenLoaded = false, channelSevenLoaded = false;
+const EMOTE_STYLE = 'height:1.5em;vertical-align:middle;margin:-2px 1px 0';
+
+function add7TV(arr){
+  (arr || []).forEach(e => { if (e && e.name && e.id) sevenTV[e.name] = 'https://cdn.7tv.app/emote/' + e.id + '/2x.webp'; });
+}
+function loadGlobal7TV(){
+  if (globalSevenLoaded) return; globalSevenLoaded = true;
+  fetch('https://7tv.io/v3/emote-sets/global').then(r => r.json())
+    .then(d => add7TV(d && d.emotes)).catch(() => {});
+}
+function loadChannel7TV(roomId){
+  if (channelSevenLoaded || !roomId) return; channelSevenLoaded = true;
+  fetch('https://7tv.io/v3/users/twitch/' + roomId).then(r => r.json())
+    .then(d => add7TV(d && d.emote_set && d.emote_set.emotes)).catch(() => {});
+}
+
+/* reemplaza palabras sueltas por emotes de 7TV (y escapa el resto) */
+function apply7TV(str){
+  return str.split(/(\s+)/).map(tok => {
+    if (tok === '') return '';
+    if (/^\s+$/.test(tok)) return tok;
+    if (sevenTV[tok]) return '<img src="' + sevenTV[tok] + '" alt="' + esc(tok) + '" style="' + EMOTE_STYLE + '">';
+    return esc(tok);
+  }).join('');
+}
+
+/* construye el HTML del mensaje: primero emotes de Twitch (por posición), luego 7TV */
+function buildMessageHTML(text, emotesTag){
+  const cps = Array.from(text || '');            // por code points (soporta emoji/animados)
+  const ranges = [];
+  if (emotesTag){
+    emotesTag.split('/').forEach(part => {
+      const c = part.indexOf(':'); if (c < 0) return;
+      const id = part.slice(0, c);
+      part.slice(c + 1).split(',').forEach(pos => {
+        const d = pos.split('-'); const s = +d[0], e = +d[1];
+        if (!isNaN(s) && !isNaN(e)) ranges.push({ s, e, id });
+      });
+    });
+    ranges.sort((a, b) => a.s - b.s);
+  }
+  let html = '', idx = 0, ri = 0;
+  while (idx < cps.length){
+    if (ri < ranges.length && ranges[ri].s === idx){
+      const r = ranges[ri++];
+      const url = 'https://static-cdn.jtvnw.net/emoticons/v2/' + r.id + '/default/dark/2.0';
+      html += '<img src="' + url + '" alt="" style="' + EMOTE_STYLE + '">';
+      idx = r.e + 1;
+    } else {
+      const next = (ri < ranges.length) ? ranges[ri].s : cps.length;
+      html += apply7TV(cps.slice(idx, next).join(''));
+      idx = next;
+    }
+  }
+  return html;
+}
+
 /* ───────────────── chat panel ───────────────── */
 function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function renderChat(name, color, text, counted){
+function renderChat(name, color, text, counted, emotesTag){
   const m = document.createElement('div');
   m.className = 'vk-msg' + (counted ? ' vote' : '');
-  m.innerHTML = '<b style="color:' + (color || '#FF2D9A') + '">' + esc(name) + '</b> ' + esc(text) +
+  m.innerHTML = '<b style="color:' + (color || '#FF2D9A') + '">' + esc(name) + '</b> ' + buildMessageHTML(text, emotesTag) +
                 (counted ? '<span class="vk-badge">✓ ' + counted + '</span>' : '');
   chatBox.appendChild(m);
   while (chatBox.children.length > 40) chatBox.removeChild(chatBox.firstChild);
@@ -285,17 +345,22 @@ function renderChat(name, color, text, counted){
 /* entrada unificada de chat */
 function onChat(d){
   const counted = registerVote(d.userId, d.text);
-  renderChat(d.name, d.color, d.text, counted);
+  renderChat(d.name, d.color, d.text, counted, d.emotes);
 }
 
 /* ───────────────── Twitch IRC anónimo (#bloodsitax) ───────────────── */
-function parseIRC(line){
-  let tags = {}, i = 0;
+function parseTags(line){
+  const tags = {};
   if (line[0] === '@'){
     const end = line.indexOf(' ');
     line.slice(1, end).split(';').forEach(p => { const eq = p.indexOf('='); if (eq >= 0) tags[p.slice(0,eq)] = p.slice(eq+1); });
-    i = end + 1;
   }
+  return tags;
+}
+function parseIRC(line){
+  const tags = parseTags(line);
+  let i = 0;
+  if (line[0] === '@') i = line.indexOf(' ') + 1;
   const rest = line.slice(i);
   let nick = '';
   if (rest[0] === ':'){ const ex = rest.indexOf('!'); nick = ex > 0 ? rest.slice(1, ex) : ''; }
@@ -324,14 +389,21 @@ function connectTwitch(){
     ev.data.split('\r\n').forEach(line => {
       if (!line) return;
       if (line.indexOf('PING') === 0){ ws.send('PONG :tmi.twitch.tv'); return; }
+      if (line.indexOf('ROOMSTATE') !== -1){
+        const t = parseTags(line);
+        if (t['room-id']) loadChannel7TV(t['room-id']);   // ID del canal desde el propio chat
+        return;
+      }
       if (line.indexOf('PRIVMSG') !== -1){
         const p = parseIRC(line);
         if (!p) return;
+        if (p.tags['room-id']) loadChannel7TV(p.tags['room-id']);   // respaldo por si no llegó ROOMSTATE
         onChat({
           userId: p.tags['user-id'] || p.nick,
           name:   p.tags['display-name'] || p.nick || '?',
           color:  p.tags['color'] || null,
-          text:   p.text
+          text:   p.text,
+          emotes: p.tags['emotes'] || ''
         });
       }
     });
@@ -344,6 +416,7 @@ function connectTwitch(){
 function activate(){
   preload();        // imágenes en background
   connectTwitch();  // conectar el chat la primera vez
+  loadGlobal7TV();  // emotes globales de 7TV (no necesita ID del canal)
 }
 let activated = false;
 function maybeActivate(){ if (!activated){ activated = true; activate(); } }
