@@ -257,7 +257,7 @@
   transition: left .5s ease;
 }
 .spin-btn:hover:not(:disabled) {
-  transform: translateY(-3px);
+  transform: scale(1.04);
   box-shadow: 0 0 30px var(--pk), 0 0 60px rgba(255,45,154,.55);
 }
 .spin-btn:hover:not(:disabled)::before { left: 100%; }
