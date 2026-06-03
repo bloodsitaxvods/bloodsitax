@@ -26,10 +26,10 @@
 }
 
 /* ─────────── tarjetas ─────────── */
-.vk-cards { display: flex; gap: 18px; justify-content: center; align-items: flex-end; flex-wrap: wrap; }
+.vk-cards { display: flex; gap: 14px; justify-content: center; align-items: flex-end; flex-wrap: wrap; margin-top: 66px; }
 
 .vk-card {
-  position: relative; width: 172px;
+  position: relative; width: 150px;
   opacity: 0; transform: translateY(24px) scale(.92);
   transition: opacity .45s ease, transform .55s cubic-bezier(.2,1.2,.3,1);
 }
@@ -52,8 +52,8 @@
 
 .vk-letter {
   position: absolute; top: -14px; left: -14px; z-index: 5;
-  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
-  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 22px; color: #fff;
+  width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 20px; color: #fff;
   background: radial-gradient(circle at 35% 30%, #2a0018, #11000b);
   border: 2px solid var(--hot-pink);
   box-shadow: 0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5);
@@ -61,7 +61,7 @@
 }
 
 .vk-frame {
-  position: relative; height: 230px; border-radius: 16px; overflow: hidden;
+  position: relative; height: 200px; border-radius: 16px; overflow: hidden;
   background: linear-gradient(135deg, var(--almost-black), var(--dark-purple));
   border: 1px solid var(--deep-magenta);
   box-shadow: 0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12);
@@ -84,11 +84,11 @@
 
 .vk-name {
   margin-top: 10px; text-align: center;
-  font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .05em; color: #fff;
-  padding: 7px 6px; border: 1px solid var(--deep-magenta); border-radius: 10px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: .04em; color: #fff;
+  padding: 6px 5px; border: 1px solid var(--deep-magenta); border-radius: 10px;
   background: linear-gradient(180deg, rgba(255,45,154,.08), rgba(255,45,154,.02));
   text-shadow: 0 0 6px rgba(255,45,154,.4);
-  min-height: 38px; display: flex; align-items: center; justify-content: center;
+  min-height: 34px; display: flex; align-items: center; justify-content: center;
 }
 
 .vk-bar {
