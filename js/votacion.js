@@ -24,39 +24,35 @@ let fbRef = null;          // referencia a la rama
 let fbReady = false;
 let fbLastPush = 0;        // throttle de escrituras
 
-/* Carga el SDK de Firebase (compat) una sola vez y prepara la referencia */
+/* Conecta a Firebase (los scripts ya vienen cargados desde index.html) */
+let fbLastPayload = null;   // guarda el último estado por si Firebase aún no estaba listo
 function loadFirebase(){
-  if (window.__bsxFbVotacion) { fbRef = window.__bsxFbVotacion; fbReady = true; return; }
-  function boot(){
-    try {
-      // Reutiliza una app existente con esta misma config si ya está inicializada
-      let app;
-      const existing = firebase.apps && firebase.apps.find(a => a.options && a.options.projectId === FB_CONFIG.projectId);
-      app = existing || firebase.initializeApp(FB_CONFIG, 'votacion-' + Date.now());
-      fbRef = firebase.database(app).ref(FB_PATH);
-      window.__bsxFbVotacion = fbRef;
-      fbReady = true;
-    } catch(e){ console.warn('Firebase votación no disponible:', e); }
+  if (fbReady && fbRef) return;
+  if (window.__bsxFbVotacion) { fbRef = window.__bsxFbVotacion; fbReady = true; flushPending(); return; }
+  if (!window.firebase || !firebase.database){
+    console.warn('Firebase SDK no cargado. Revisa los <script> de firebase en index.html');
+    setTimeout(loadFirebase, 600);   // reintenta por si los scripts aún cargan
+    return;
   }
-  if (window.firebase && firebase.database) { boot(); return; }
-  // Inyecta los scripts compat si no están
-  const s1 = document.createElement('script');
-  s1.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js';
-  s1.onload = () => {
-    const s2 = document.createElement('script');
-    s2.src = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js';
-    s2.onload = boot;
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
+  try {
+    let app;
+    const existing = firebase.apps && firebase.apps.find(a => a.options && a.options.projectId === FB_CONFIG.projectId);
+    app = existing || firebase.initializeApp(FB_CONFIG, 'votacion-' + Date.now());
+    fbRef = firebase.database(app).ref(FB_PATH);
+    window.__bsxFbVotacion = fbRef;
+    fbReady = true;
+    console.log('✓ Firebase votación conectado');
+    flushPending();
+  } catch(e){ console.warn('Firebase votación no disponible:', e); }
+}
+/* reenvía el último estado si quedó pendiente mientras Firebase conectaba */
+function flushPending(){
+  if (fbReady && fbRef && fbLastPayload){ try { fbRef.set(fbLastPayload); } catch(e){} }
 }
 
 /* Publica el estado actual al overlay. force=true ignora el throttle */
 function pushState(phase, force){
-  if (!fbReady || !fbRef) return;
   const now = Date.now();
-  if (!force && now - fbLastPush < 250) return;   // máx ~4 escrituras/seg
-  fbLastPush = now;
   const payload = {
     phase: phase || 'idle',                       // idle | rolled | voting | results
     options: S.options,                           // [{letter,name,img}]
@@ -67,6 +63,10 @@ function pushState(phase, force){
     winner: S._winner || null,                    // {letters:[...], tie:bool}
     ts: now
   };
+  fbLastPayload = payload;                         // guarda siempre (por si Firebase aún no carga)
+  if (!fbReady || !fbRef){ loadFirebase(); return; }
+  if (!force && now - fbLastPush < 250) return;   // máx ~4 escrituras/seg
+  fbLastPush = now;
   try { fbRef.set(payload); } catch(e){}
 }
 
@@ -501,6 +501,7 @@ document.querySelectorAll('[data-tab="votacion"],[data-goto="votacion"]').forEac
 
 /* ───────────────── controles ───────────────── */
 buildCards();
+loadFirebase();   // conecta Firebase de inmediato al cargar la página
 rollBtn.addEventListener('click', roll);
 voteBtn.addEventListener('click', startVoting);
 
