@@ -34,8 +34,8 @@ html, body{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  gap:34px;
-  padding:30px;
+  gap:16px;
+  padding:18px;
 }
 
 /* ===== FILA HORIZONTAL ===== */
@@ -44,30 +44,29 @@ html, body{
   flex-direction:row;
   align-items:center;
   justify-content:center;
-  gap:32px;
+  gap:14px;
 }
 
-/* ===== TÍTULOS DE SECCIÓN ===== */
-.section-title{
+/* ===== TÍTULO ÚNICO ===== */
+.main-title{
   font-family:'Bebas Neue', sans-serif;
-  font-size:1.9rem;
-  letter-spacing:.32em;
+  font-size:1.5rem;
+  letter-spacing:.26em;
   text-align:center;
-  margin-bottom:18px;
   color:#fff;
   text-transform:uppercase;
   text-shadow:
     0 0 4px #fff,
-    0 0 12px var(--pk),
-    0 0 24px var(--pk),
-    0 0 44px var(--pi);
+    0 0 10px var(--pk),
+    0 0 20px var(--pk),
+    0 0 36px var(--pi);
 }
-.section-title .deco{ color:var(--pk); margin:0 12px; }
+.main-title .deco{ color:var(--pk); margin:0 10px; }
 
 /* ===== COLUMNA SURVIVOR ===== */
 .survivor-col{ display:flex; flex-direction:column; align-items:center; }
 
-.survivor-frame{ position:relative; width:155px; height:155px; flex-shrink:0; }
+.survivor-frame{ position:relative; width:118px; height:118px; flex-shrink:0; }
 
 .survivor-card{
   position:absolute; inset:0; border-radius:18px;
@@ -96,13 +95,13 @@ html, body{
 .perks-row{
   display:flex;
   flex-direction:row;
-  gap:56px;
+  gap:40px;
   align-items:center;
-  padding:18px 14px;
+  padding:12px 8px;
 }
 
 .perk-slot{
-  width:108px; height:108px;
+  width:80px; height:80px;
   transform:rotate(45deg);          /* DIAMANTE */
   border:2px solid var(--br);
   background:linear-gradient(135deg,var(--almost-black) 0%,var(--dark-purple) 100%);
@@ -132,12 +131,12 @@ html, body{
 /* ===== BOTÓN VOLVER A GIRAR ===== */
 #spinBtn{
   font-family:'Bebas Neue', sans-serif;
-  font-size:1.4rem; letter-spacing:.26em;
+  font-size:1.05rem; letter-spacing:.22em;
   color:#000; background:var(--pk); border:none;
-  padding:15px 52px; border-radius:999px;
+  padding:10px 36px; border-radius:999px;
   cursor:pointer; position:relative; overflow:hidden;
   transition:all .3s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 0 16px var(--pk),0 0 32px rgba(255,45,154,.5);
+  box-shadow:0 0 14px var(--pk),0 0 28px rgba(255,45,154,.5);
   text-transform:uppercase;
 }
 #spinBtn::before{
@@ -171,23 +170,25 @@ html, body{
 #loadFill{ height:100%; width:0%; background:linear-gradient(90deg,var(--br),var(--pk)); box-shadow:0 0 6px var(--pk); transition:width .25s ease; }
 
 /* ===== RESPONSIVE ===== */
-@media(max-width:780px){
-  .row{ gap:30px; }
-  .survivor-frame{ width:190px; height:255px; }
-  #survivorImg{ height:170px; }
-  .perk-slot{ width:84px; height:84px; }
-  .perks-row{ gap:24px; }
+@media(max-width:620px){
+  .row{ gap:10px; }
+  .survivor-frame{ width:100px; height:100px; }
+  .perk-slot{ width:66px; height:66px; }
+  .perks-row{ gap:32px; }
+  .main-title{ font-size:1.2rem; letter-spacing:.18em; }
 }
 </style>
 </head>
 <body>
 
 <div class="overlay">
+
+  <div class="main-title"><span class="deco">✦</span>SURVI Y PERKS RANDOM<span class="deco">✦</span></div>
+
   <div class="row">
 
     <!-- ===== SURVIVOR ===== -->
     <div class="survivor-col">
-      <div class="section-title"><span class="deco">✦</span>SURVIVOR<span class="deco">✦</span></div>
       <div class="survivor-frame">
         <div class="survivor-card">
           <div id="survivorImg"></div>
@@ -195,9 +196,8 @@ html, body{
       </div>
     </div>
 
-    <!-- ===== PERKS RANDOM ===== -->
+    <!-- ===== PERKS ===== -->
     <div class="perks-col">
-      <div class="section-title"><span class="deco">✦</span>PERKS RANDOM<span class="deco">✦</span></div>
       <div class="perks-row">
         <div class="perk-slot"><div class="perk-img" id="perk1"></div></div>
         <div class="perk-slot"><div class="perk-img" id="perk2"></div></div>
