@@ -185,3 +185,24 @@
   .vk-card { width: 140px; }
   .vk-frame { height: 188px; }
 }
+
+/* ===== LINK SUTIL AL OVERLAY OBS ===== */
+#votacion .vk-overlay-link-wrap {
+  text-align: center;
+  margin-top: 14px;
+}
+#votacion .vk-overlay-link {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: .85rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--deep-magenta);
+  text-decoration: none;
+  display: inline-block;
+  padding: 4px 10px;
+  transition: color .3s ease, text-shadow .3s ease;
+}
+#votacion .vk-overlay-link:hover {
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink), 0 0 20px rgba(255,45,154,.5);
+}
