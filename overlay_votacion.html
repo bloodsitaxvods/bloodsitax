@@ -44,19 +44,27 @@ html, body{
 }
 .main-title .deco{ color:var(--neon-pink); margin:0 12px; }
 
-/* ===== TIMER ===== */
+/* ===== FILA: CARDS + TIMER AL LADO ===== */
+.stage{
+  display:flex; flex-direction:row;
+  align-items:center; justify-content:center;
+  gap:26px;
+}
+
+/* ===== TIMER (al lado de las cartas) ===== */
 .timer-wrap{
-  display:none; align-items:center; gap:8px; margin-bottom:2px;
+  display:none; flex-direction:column; align-items:center; gap:2px;
+  flex-shrink:0;
 }
 .timer-wrap.on{ display:flex; }
 #timer{
-  font-family:'Orbitron', sans-serif; font-weight:900; font-size:34px; color:#fff;
-  min-width:60px; text-align:center;
+  font-family:'Orbitron', sans-serif; font-weight:900; font-size:48px; color:#fff;
+  min-width:80px; text-align:center; line-height:1;
   text-shadow:0 0 12px var(--hot-pink), 0 0 28px var(--hot-pink);
 }
 #timer.low{ color:#ff3b3b; text-shadow:0 0 14px #ff3b3b, 0 0 30px #ff3b3b; animation:tick .5s ease-in-out infinite; }
 @keyframes tick{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
-.timer-wrap small{ font-family:'Orbitron', sans-serif; font-size:11px; letter-spacing:2px; color:var(--bright-pink); }
+.timer-wrap small{ font-family:'Orbitron', sans-serif; font-size:13px; letter-spacing:2px; color:var(--bright-pink); }
 
 /* ===== CARDS ===== */
 .cards{ display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:nowrap; }
@@ -149,17 +157,13 @@ html, body{
 .result.on{ opacity:1; transform:translateY(0); }
 .result .g{ color:var(--gold); text-shadow:0 0 12px var(--gold), 0 0 28px var(--gold); }
 
-/* ===== ESPERA (sin datos) ===== */
-.waiting{
-  font-family:'Bebas Neue', sans-serif; font-size:1rem; letter-spacing:.2em;
-  color:var(--deep-magenta); text-transform:uppercase; opacity:.7;
-}
-
 @media(max-width:680px){
+  .stage{ gap:14px; }
   .cards{ gap:10px; }
   .card{ width:108px; }
   .frame{ height:150px; }
   .main-title{ font-size:1.5rem; letter-spacing:.2em; }
+  #timer{ font-size:36px; }
 }
 </style>
 </head>
@@ -168,15 +172,14 @@ html, body{
 <div class="overlay">
   <div class="main-title"><span class="deco">✦</span>VOTA EN EL CHAT<span class="deco">✦</span></div>
 
-  <div class="timer-wrap" id="timerWrap">
-    <span id="timer">20</span><small>SEG</small>
+  <div class="stage">
+    <div class="cards" id="cards"></div>
+    <div class="timer-wrap" id="timerWrap">
+      <span id="timer">20</span><small>SEG</small>
+    </div>
   </div>
 
-  <div class="cards" id="cards"></div>
-
   <div class="result" id="result"></div>
-
-  <div class="waiting" id="waiting">Esperando votación…</div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -201,7 +204,6 @@ const cardsEl  = document.getElementById('cards');
 const timerWrap= document.getElementById('timerWrap');
 const timerEl  = document.getElementById('timer');
 const resultEl = document.getElementById('result');
-const waitingEl= document.getElementById('waiting');
 
 const setImg = (el, src) => { el.style.backgroundImage = 'url("' + src + '")'; };
 function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -225,25 +227,26 @@ function buildCards(){
 const cardOf = L => cardsEl.querySelector('.card[data-letter="'+L+'"]');
 
 buildCards();
+render(null);   // muestra 4 cartas vacías de inmediato (no espera a Firebase)
 
 /* aplica el estado recibido de Firebase */
 function render(st){
   if (!st || !st.options || !st.options.length || st.phase === 'idle'){
-    // sin datos / limpio
-    waitingEl.style.display = 'block';
+    // sin datos / limpio → mostrar 4 cartas vacías listas (A/B/C/D)
     timerWrap.classList.remove('on');
     resultEl.classList.remove('on'); resultEl.innerHTML = '';
     LETTERS.forEach(L => {
       const c = cardOf(L);
-      c.className = 'card';
+      c.className = 'card show';
       c.querySelector('.name').textContent = '— — —';
       c.querySelector('.pct').textContent = '0%';
       c.querySelector('.bar i').style.width = '0%';
+      const portrait = c.querySelector('.portrait');
+      portrait.style.backgroundImage = '';
+      portrait.dataset.img = '';
     });
     return;
   }
-
-  waitingEl.style.display = 'none';
 
   const counts = st.counts || {A:0,B:0,C:0,D:0};
   const total  = st.total || 0;
@@ -307,8 +310,7 @@ try {
   const ref = firebase.database(app).ref(FB_PATH);
   ref.on('value', snap => { render(snap.val()); });
 } catch(e){
-  waitingEl.textContent = 'Error de conexión Firebase';
-  console.error(e);
+  console.error('Error de conexión Firebase:', e);
 }
 
 })();
