@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOODSITAX — Votación Overlay (Chroma)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@600;700;900&family=Bungee&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   BLOODSITAX — Overlay Votación Killer para OBS
+   Solo ESCUCHA Firebase (no cuenta votos). Fondo croma verde.
+   ============================================================ */
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root{
+  --neon-pink:#FF2D9A; --hot-pink:#FF007F; --deep-magenta:#8A003F;
+  --almost-black:#12000D; --dark-purple:#1A0010;
+  --bright-pink:#FF69B4; --gold:#ffd24a;
+  --chroma:#00FF00;
+}
+
+html, body{
+  width:100%; min-height:100vh;
+  background:var(--chroma);
+  font-family:'Bebas Neue', sans-serif;
+  overflow:hidden;
+}
+
+.overlay{
+  width:100%; min-height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px; padding:24px 18px;
+}
+
+/* ===== TÍTULO ===== */
+.main-title{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:2rem; letter-spacing:.3em;
+  color:#fff; text-transform:uppercase; text-align:center;
+  text-shadow:0 0 4px #fff, 0 0 12px var(--neon-pink), 0 0 26px var(--hot-pink), 0 0 46px var(--deep-magenta);
+}
+.main-title .deco{ color:var(--neon-pink); margin:0 12px; }
+
+/* ===== TIMER ===== */
+.timer-wrap{
+  display:none; align-items:center; gap:8px; margin-bottom:2px;
+}
+.timer-wrap.on{ display:flex; }
+#timer{
+  font-family:'Orbitron', sans-serif; font-weight:900; font-size:34px; color:#fff;
+  min-width:60px; text-align:center;
+  text-shadow:0 0 12px var(--hot-pink), 0 0 28px var(--hot-pink);
+}
+#timer.low{ color:#ff3b3b; text-shadow:0 0 14px #ff3b3b, 0 0 30px #ff3b3b; animation:tick .5s ease-in-out infinite; }
+@keyframes tick{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+.timer-wrap small{ font-family:'Orbitron', sans-serif; font-size:11px; letter-spacing:2px; color:var(--bright-pink); }
+
+/* ===== CARDS ===== */
+.cards{ display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:nowrap; }
+
+.card{
+  position:relative; width:150px;
+  opacity:0; transform:translateY(20px) scale(.92);
+  transition:opacity .4s ease, transform .5s cubic-bezier(.2,1.2,.3,1);
+}
+.card.show{ opacity:1; transform:translateY(0) scale(1); }
+
+.pct{
+  position:absolute; top:-40px; left:50%; transform:translateX(-50%) scale(.6);
+  font-family:'Orbitron', sans-serif; font-weight:900; font-size:24px;
+  color:#fff; text-shadow:0 0 10px var(--hot-pink), 0 0 24px var(--hot-pink);
+  opacity:0; transition:opacity .4s ease, transform .4s cubic-bezier(.2,1.4,.3,1); pointer-events:none;
+}
+.card.voting .pct, .card.results .pct{ opacity:1; transform:translateX(-50%) scale(1); }
+
+.letter{
+  position:absolute; top:-14px; left:-14px; z-index:5;
+  width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
+  font-family:'Orbitron', sans-serif; font-weight:900; font-size:20px; color:#fff;
+  background:radial-gradient(circle at 35% 30%, #2a0018, #11000b);
+  border:2px solid var(--hot-pink);
+  box-shadow:0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5);
+  text-shadow:0 0 8px var(--hot-pink);
+}
+
+.frame{
+  position:relative; height:200px; border-radius:16px; overflow:hidden;
+  background:linear-gradient(135deg, var(--almost-black), var(--dark-purple));
+  border:1px solid var(--deep-magenta);
+  box-shadow:0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12);
+  animation:breathe 3.4s ease-in-out infinite;
+}
+@keyframes breathe{
+  0%,100%{ box-shadow:0 0 10px rgba(255,45,154,.3), inset 0 0 16px rgba(255,45,154,.10); }
+  50%    { box-shadow:0 0 20px rgba(255,45,154,.7), inset 0 0 24px rgba(255,45,154,.22); }
+}
+.portrait{
+  width:100%; height:100%;
+  background-size:cover; background-position:center top; background-repeat:no-repeat;
+}
+.frame::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(to bottom, transparent 60%, #0A0005 100%);
+}
+
+.name{
+  margin-top:10px; text-align:center;
+  font-family:'Bebas Neue', sans-serif; font-size:1rem; letter-spacing:.04em; color:#fff;
+  padding:6px 5px; border:1px solid var(--deep-magenta); border-radius:10px;
+  background:linear-gradient(180deg, rgba(255,45,154,.08), rgba(255,45,154,.02));
+  text-shadow:0 0 6px rgba(255,45,154,.4);
+  min-height:34px; display:flex; align-items:center; justify-content:center;
+}
+
+.bar{
+  height:8px; border-radius:6px; margin-top:7px; overflow:hidden;
+  background:rgba(255,45,154,.12); border:1px solid rgba(255,45,154,.32);
+  opacity:0; transition:opacity .35s ease;
+}
+.card.voting .bar, .card.results .bar{ opacity:1; }
+.bar > i{
+  display:block; height:100%; width:0%;
+  background:linear-gradient(90deg, var(--deep-magenta), var(--hot-pink), var(--neon-pink));
+  box-shadow:0 0 10px var(--hot-pink);
+  transition:width .5s cubic-bezier(.2,.8,.2,1);
+}
+
+/* GANADOR */
+.card.winner .frame{
+  border-color:var(--gold);
+  box-shadow:0 0 42px var(--gold), 0 0 78px rgba(255,210,74,.65), inset 0 0 46px rgba(255,210,74,.45);
+  animation:win 1s ease-in-out infinite;
+}
+@keyframes win{ 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.03)} }
+.card.winner .pct{ color:var(--gold); text-shadow:0 0 21px var(--gold), 0 0 49px var(--gold), 0 0 70px rgba(255,210,74,.6); }
+.card.winner .letter{ border-color:var(--gold); box-shadow:0 0 24px var(--gold), 0 0 44px rgba(255,210,74,.6); color:var(--gold); text-shadow:0 0 14px var(--gold); }
+.card.winner .name{ border-color:var(--gold); color:var(--gold); text-shadow:0 0 17px var(--gold); box-shadow:0 0 22px rgba(255,210,74,.5); }
+.card.dim{ opacity:.5; filter:grayscale(.35); }
+
+/* ===== RESULTADO ===== */
+.result{
+  margin-top:8px; min-height:28px; text-align:center;
+  font-family:'Bungee', sans-serif; font-size:1.15rem; letter-spacing:1px; color:#fff;
+  opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease;
+}
+.result.on{ opacity:1; transform:translateY(0); }
+.result .g{ color:var(--gold); text-shadow:0 0 12px var(--gold), 0 0 28px var(--gold); }
+
+/* ===== ESPERA (sin datos) ===== */
+.waiting{
+  font-family:'Bebas Neue', sans-serif; font-size:1rem; letter-spacing:.2em;
+  color:var(--deep-magenta); text-transform:uppercase; opacity:.7;
+}
+
+@media(max-width:680px){
+  .cards{ gap:10px; }
+  .card{ width:108px; }
+  .frame{ height:150px; }
+  .main-title{ font-size:1.5rem; letter-spacing:.2em; }
+}
+</style>
+</head>
+<body>
+
+<div class="overlay">
+  <div class="main-title"><span class="deco">✦</span>VOTA EN EL CHAT<span class="deco">✦</span></div>
+
+  <div class="timer-wrap" id="timerWrap">
+    <span id="timer">20</span><small>SEG</small>
+  </div>
+
+  <div class="cards" id="cards"></div>
+
+  <div class="result" id="result"></div>
+
+  <div class="waiting" id="waiting">Esperando votación…</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+(function(){
+'use strict';
+
+const FB_CONFIG = {
+  apiKey: "AIzaSyCvOE9lhvEy3ts01nQyUBxL76gxW9qCCG8",
+  authDomain: "bloodsitax-timer.firebaseapp.com",
+  databaseURL: "https://bloodsitax-timer-default-rtdb.firebaseio.com",
+  projectId: "bloodsitax-timer",
+  storageBucket: "bloodsitax-timer.firebasestorage.app",
+  messagingSenderId: "273272843655",
+  appId: "1:273272843655:web:ea5902418ea67a1c48b722"
+};
+const FB_PATH = 'votacion-killer/estado';
+const LETTERS = ['A','B','C','D'];
+
+const cardsEl  = document.getElementById('cards');
+const timerWrap= document.getElementById('timerWrap');
+const timerEl  = document.getElementById('timer');
+const resultEl = document.getElementById('result');
+const waitingEl= document.getElementById('waiting');
+
+const setImg = (el, src) => { el.style.backgroundImage = 'url("' + src + '")'; };
+function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* construir 4 tarjetas vacías */
+function buildCards(){
+  cardsEl.innerHTML = '';
+  LETTERS.forEach(L => {
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.dataset.letter = L;
+    c.innerHTML =
+      '<div class="pct">0%</div>' +
+      '<div class="letter">'+L+'</div>' +
+      '<div class="frame"><div class="portrait"></div></div>' +
+      '<div class="name">— — —</div>' +
+      '<div class="bar"><i></i></div>';
+    cardsEl.appendChild(c);
+  });
+}
+const cardOf = L => cardsEl.querySelector('.card[data-letter="'+L+'"]');
+
+buildCards();
+
+/* aplica el estado recibido de Firebase */
+function render(st){
+  if (!st || !st.options || !st.options.length || st.phase === 'idle'){
+    // sin datos / limpio
+    waitingEl.style.display = 'block';
+    timerWrap.classList.remove('on');
+    resultEl.classList.remove('on'); resultEl.innerHTML = '';
+    LETTERS.forEach(L => {
+      const c = cardOf(L);
+      c.className = 'card';
+      c.querySelector('.name').textContent = '— — —';
+      c.querySelector('.pct').textContent = '0%';
+      c.querySelector('.bar i').style.width = '0%';
+    });
+    return;
+  }
+
+  waitingEl.style.display = 'none';
+
+  const counts = st.counts || {A:0,B:0,C:0,D:0};
+  const total  = st.total || 0;
+  const phase  = st.phase || 'rolled';
+
+  // pintar cada card según su opción
+  st.options.forEach(opt => {
+    const c = cardOf(opt.letter);
+    if (!c) return;
+    c.classList.add('show');
+    const portrait = c.querySelector('.portrait');
+    if (portrait.dataset.img !== opt.img){ setImg(portrait, opt.img); portrait.dataset.img = opt.img; }
+    c.querySelector('.name').textContent = opt.name;
+  });
+
+  // fase
+  LETTERS.forEach(L => {
+    const c = cardOf(L);
+    c.classList.remove('voting','results','winner','dim');
+    if (phase === 'voting') c.classList.add('voting');
+    if (phase === 'results') c.classList.add('results');
+    const pct = total ? Math.round((counts[L]||0)/total*100) : 0;
+    c.querySelector('.pct').textContent = pct + '%';
+    c.querySelector('.bar i').style.width = pct + '%';
+  });
+
+  // timer
+  if (phase === 'voting'){
+    timerWrap.classList.add('on');
+    timerEl.textContent = Math.max(0, st.left || 0);
+    timerEl.classList.toggle('low', (st.left || 0) <= 5);
+  } else {
+    timerWrap.classList.remove('on');
+  }
+
+  // resultado / ganador
+  if (phase === 'results' && st.winner){
+    const w = st.winner;
+    if (w.empty){
+      resultEl.innerHTML = 'Sin votos 😶';
+    } else if (w.tie){
+      w.letters.forEach(L => cardOf(L).classList.add('winner'));
+      LETTERS.filter(L => w.letters.indexOf(L) === -1).forEach(L => cardOf(L).classList.add('dim'));
+      resultEl.innerHTML = '¡EMPATE! → ' + w.letters.join(' / ');
+    } else {
+      const L = w.letters[0];
+      const opt = st.options.find(o => o.letter === L);
+      cardOf(L).classList.add('winner');
+      LETTERS.filter(x => x !== L).forEach(x => cardOf(x).classList.add('dim'));
+      resultEl.innerHTML = 'GANADOR: <span class="g">' + L + ') ' + esc(opt ? opt.name : '') + '</span> 🩸';
+    }
+    resultEl.classList.add('on');
+  } else {
+    resultEl.classList.remove('on'); resultEl.innerHTML = '';
+  }
+}
+
+/* conectar Firebase y escuchar */
+try {
+  const app = firebase.initializeApp(FB_CONFIG);
+  const ref = firebase.database(app).ref(FB_PATH);
+  ref.on('value', snap => { render(snap.val()); });
+} catch(e){
+  waitingEl.textContent = 'Error de conexión Firebase';
+  console.error(e);
+}
+
+})();
+</script>
+</body>
+</html>
