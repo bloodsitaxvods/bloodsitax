@@ -170,3 +170,24 @@
   background-repeat: no-repeat;
   border-radius: 0;
 }
+
+/* ===== LINK SUTIL AL OVERLAY OBS ===== */
+#survivor .overlay-link-wrap {
+  text-align: center;
+  margin-top: 16px;
+}
+#survivor .overlay-link {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: .82rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--br);
+  text-decoration: none;
+  display: inline-block;
+  padding: 4px 10px;
+  transition: color .3s ease, text-shadow .3s ease;
+}
+#survivor .overlay-link:hover {
+  color: var(--pk);
+  text-shadow: 0 0 10px var(--pk), 0 0 20px rgba(255,45,154,.5);
+}
