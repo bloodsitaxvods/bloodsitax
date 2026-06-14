@@ -103,7 +103,7 @@
               </div>
               <div class="vk-result" id="vkResult"></div>
               <div class="vk-overlay-link-wrap">
-                <a href="overlay_votacion.html" target="_blank" class="vk-overlay-link">♡ Abrir overlay para OBS ♡</a>
+                <a href="overlay_votacion.html" target="_blank" class="vk-overlay-link">Overlay OBS</a>
               </div>
             </div>
             <aside class="vk-chat">
@@ -234,6 +234,9 @@
             <div id="survBurst"></div>
             <div id="survLoadWrap"><div id="survLoadFill"></div></div>
             <button id="survSpinBtn" disabled>CARGANDO...</button>
+          </div>
+          <div class="overlay-link-wrap">
+            <a href="overlay_survivor.html" target="_blank" class="overlay-link">Overlay OBS</a>
           </div>
         </div>
       </section>
@@ -418,6 +421,10 @@
       document.getElementById('centerImageInput').click();
     });
   </script>
+
+  <!-- Firebase (para sincronizar votación con overlay OBS) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
   <!-- Scripts en orden -->
   <script src="js/main.js"></script>
