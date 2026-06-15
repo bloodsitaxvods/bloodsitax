@@ -3,316 +3,221 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLOODSITAX — Votación Overlay (Chroma)</title>
+<title>BLOODSITAX — Votación Overlay Independiente (Chroma)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@600;700;900&family=Bungee&display=swap" rel="stylesheet">
 <style>
-/* ============================================================
-   BLOODSITAX — Overlay Votación Killer para OBS
-   Solo ESCUCHA Firebase (no cuenta votos). Fondo croma verde.
-   ============================================================ */
 * { margin:0; padding:0; box-sizing:border-box; }
-
 :root{
   --neon-pink:#FF2D9A; --hot-pink:#FF007F; --deep-magenta:#8A003F;
-  --almost-black:#12000D; --dark-purple:#1A0010;
-  --bright-pink:#FF69B4; --gold:#ffd24a;
-  --chroma:#00FF00;
+  --almost-black:#12000D; --dark-purple:#1A0010; --dg:#48001F;
+  --bright-pink:#FF69B4; --gold:#ffd24a; --chroma:#00FF00;
 }
-
-html, body{
-  width:100%; min-height:100vh;
-  background:var(--chroma);
-  font-family:'Bebas Neue', sans-serif;
-  overflow:hidden;
-}
-
-.overlay{
-  width:100%; min-height:100vh;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:14px; padding:24px 18px;
-}
-
-/* ===== TÍTULO ===== */
-.main-title{
-  font-family:'Bebas Neue', sans-serif;
-  font-size:2rem; letter-spacing:.3em;
-  color:#fff; text-transform:uppercase; text-align:center;
-  text-shadow:0 0 4px #fff, 0 0 12px var(--neon-pink), 0 0 26px var(--hot-pink), 0 0 46px var(--deep-magenta);
-}
+html, body{ width:100%; min-height:100vh; background:var(--chroma); font-family:'Bebas Neue', sans-serif; overflow:hidden; }
+.overlay{ width:100%; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px 18px; }
+.main-title{ font-family:'Bebas Neue', sans-serif; font-size:2rem; letter-spacing:.3em; color:#fff; text-transform:uppercase; text-align:center; text-shadow:0 0 4px #fff, 0 0 12px var(--neon-pink), 0 0 26px var(--hot-pink), 0 0 46px var(--deep-magenta); }
 .main-title .deco{ color:var(--neon-pink); margin:0 12px; }
-
-/* ===== FILA: CARDS + TIMER AL LADO ===== */
-.stage{
-  display:flex; flex-direction:row;
-  align-items:center; justify-content:center;
-  gap:26px;
-}
-
-/* ===== TIMER (al lado de las cartas) ===== */
-.timer-wrap{
-  display:none; flex-direction:column; align-items:center; gap:2px;
-  flex-shrink:0;
-}
+.stage{ display:flex; flex-direction:row; align-items:center; justify-content:center; gap:26px; }
+.timer-wrap{ display:none; flex-direction:column; align-items:center; gap:2px; flex-shrink:0; }
 .timer-wrap.on{ display:flex; }
-#timer{
-  font-family:'Orbitron', sans-serif; font-weight:900; font-size:48px; color:#fff;
-  min-width:80px; text-align:center; line-height:1;
-  text-shadow:0 0 12px var(--hot-pink), 0 0 28px var(--hot-pink);
-}
+#timer{ font-family:'Orbitron', sans-serif; font-weight:900; font-size:48px; color:#fff; min-width:80px; text-align:center; line-height:1; text-shadow:0 0 12px var(--hot-pink), 0 0 28px var(--hot-pink); }
 #timer.low{ color:#ff3b3b; text-shadow:0 0 14px #ff3b3b, 0 0 30px #ff3b3b; animation:tick .5s ease-in-out infinite; }
 @keyframes tick{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
 .timer-wrap small{ font-family:'Orbitron', sans-serif; font-size:13px; letter-spacing:2px; color:var(--bright-pink); }
-
-/* ===== CARDS ===== */
 .cards{ display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:nowrap; }
-
-.card{
-  position:relative; width:150px;
-  opacity:0; transform:translateY(20px) scale(.92);
-  transition:opacity .4s ease, transform .5s cubic-bezier(.2,1.2,.3,1);
-}
+.card{ position:relative; width:150px; opacity:0; transform:translateY(20px) scale(.92); transition:opacity .4s ease, transform .5s cubic-bezier(.2,1.2,.3,1); }
 .card.show{ opacity:1; transform:translateY(0) scale(1); }
-
-.pct{
-  position:absolute; top:-40px; left:50%; transform:translateX(-50%) scale(.6);
-  font-family:'Orbitron', sans-serif; font-weight:900; font-size:24px;
-  color:#fff; text-shadow:0 0 10px var(--hot-pink), 0 0 24px var(--hot-pink);
-  opacity:0; transition:opacity .4s ease, transform .4s cubic-bezier(.2,1.4,.3,1); pointer-events:none;
-}
+.pct{ position:absolute; top:-40px; left:50%; transform:translateX(-50%) scale(.6); font-family:'Orbitron', sans-serif; font-weight:900; font-size:24px; color:#fff; text-shadow:0 0 10px var(--hot-pink), 0 0 24px var(--hot-pink); opacity:0; transition:opacity .4s ease, transform .4s cubic-bezier(.2,1.4,.3,1); pointer-events:none; }
 .card.voting .pct, .card.results .pct{ opacity:1; transform:translateX(-50%) scale(1); }
-
-.letter{
-  position:absolute; top:-14px; left:-14px; z-index:5;
-  width:42px; height:42px; border-radius:50%; display:grid; place-items:center;
-  font-family:'Orbitron', sans-serif; font-weight:900; font-size:20px; color:#fff;
-  background:radial-gradient(circle at 35% 30%, #2a0018, #11000b);
-  border:2px solid var(--hot-pink);
-  box-shadow:0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5);
-  text-shadow:0 0 8px var(--hot-pink);
-}
-
-.frame{
-  position:relative; height:200px; border-radius:16px; overflow:hidden;
-  background:linear-gradient(135deg, var(--almost-black), var(--dark-purple));
-  border:1px solid var(--deep-magenta);
-  box-shadow:0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12);
-  animation:breathe 3.4s ease-in-out infinite;
-}
-@keyframes breathe{
-  0%,100%{ box-shadow:0 0 10px rgba(255,45,154,.3), inset 0 0 16px rgba(255,45,154,.10); }
-  50%    { box-shadow:0 0 20px rgba(255,45,154,.7), inset 0 0 24px rgba(255,45,154,.22); }
-}
-.portrait{
-  width:100%; height:100%;
-  background-size:cover; background-position:center top; background-repeat:no-repeat;
-}
-.frame::after{
-  content:''; position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(to bottom, transparent 60%, #0A0005 100%);
-}
-
-.name{
-  margin-top:10px; text-align:center;
-  font-family:'Bebas Neue', sans-serif; font-size:1rem; letter-spacing:.04em; color:#fff;
-  padding:6px 5px; border:1px solid var(--deep-magenta); border-radius:10px;
-  background:linear-gradient(180deg, rgba(255,45,154,.08), rgba(255,45,154,.02));
-  text-shadow:0 0 6px rgba(255,45,154,.4);
-  min-height:34px; display:flex; align-items:center; justify-content:center;
-}
-
-.bar{
-  height:8px; border-radius:6px; margin-top:7px; overflow:hidden;
-  background:rgba(255,45,154,.12); border:1px solid rgba(255,45,154,.32);
-  opacity:0; transition:opacity .35s ease;
-}
+.letter{ position:absolute; top:-14px; left:-14px; z-index:5; width:42px; height:42px; border-radius:50%; display:grid; place-items:center; font-family:'Orbitron', sans-serif; font-weight:900; font-size:20px; color:#fff; background:radial-gradient(circle at 35% 30%, #2a0018, #11000b); border:2px solid var(--hot-pink); box-shadow:0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5); text-shadow:0 0 8px var(--hot-pink); }
+.frame{ position:relative; height:200px; border-radius:16px; overflow:hidden; background:linear-gradient(135deg, var(--almost-black), var(--dark-purple)); border:1px solid var(--deep-magenta); box-shadow:0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12); animation:breathe 3.4s ease-in-out infinite; }
+@keyframes breathe{ 0%,100%{ box-shadow:0 0 10px rgba(255,45,154,.3), inset 0 0 16px rgba(255,45,154,.10); } 50%{ box-shadow:0 0 20px rgba(255,45,154,.7), inset 0 0 24px rgba(255,45,154,.22); } }
+.portrait{ width:100%; height:100%; background-size:cover; background-position:center top; background-repeat:no-repeat; }
+.portrait.spinning{ animation:roll .2s steps(2) infinite; }
+@keyframes roll{ 0%{filter:brightness(1)} 50%{filter:brightness(1.3) hue-rotate(12deg)} }
+.frame::after{ content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(to bottom, transparent 60%, #0A0005 100%); }
+.name{ margin-top:10px; text-align:center; font-family:'Bebas Neue', sans-serif; font-size:1rem; letter-spacing:.04em; color:#fff; padding:6px 5px; border:1px solid var(--deep-magenta); border-radius:10px; background:linear-gradient(180deg, rgba(255,45,154,.08), rgba(255,45,154,.02)); text-shadow:0 0 6px rgba(255,45,154,.4); min-height:34px; display:flex; align-items:center; justify-content:center; }
+.bar{ height:8px; border-radius:6px; margin-top:7px; overflow:hidden; background:rgba(255,45,154,.12); border:1px solid rgba(255,45,154,.32); opacity:0; transition:opacity .35s ease; }
 .card.voting .bar, .card.results .bar{ opacity:1; }
-.bar > i{
-  display:block; height:100%; width:0%;
-  background:linear-gradient(90deg, var(--deep-magenta), var(--hot-pink), var(--neon-pink));
-  box-shadow:0 0 10px var(--hot-pink);
-  transition:width .5s cubic-bezier(.2,.8,.2,1);
-}
-
-/* GANADOR */
-.card.winner .frame{
-  border-color:var(--gold);
-  box-shadow:0 0 42px var(--gold), 0 0 78px rgba(255,210,74,.65), inset 0 0 46px rgba(255,210,74,.45);
-  animation:win 1s ease-in-out infinite;
-}
+.bar > i{ display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--deep-magenta), var(--hot-pink), var(--neon-pink)); box-shadow:0 0 10px var(--hot-pink); transition:width .5s cubic-bezier(.2,.8,.2,1); }
+.card.winner .frame{ border-color:var(--gold); box-shadow:0 0 42px var(--gold), 0 0 78px rgba(255,210,74,.65), inset 0 0 46px rgba(255,210,74,.45); animation:win 1s ease-in-out infinite; }
 @keyframes win{ 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-4px) scale(1.03)} }
 .card.winner .pct{ color:var(--gold); text-shadow:0 0 21px var(--gold), 0 0 49px var(--gold), 0 0 70px rgba(255,210,74,.6); }
 .card.winner .letter{ border-color:var(--gold); box-shadow:0 0 24px var(--gold), 0 0 44px rgba(255,210,74,.6); color:var(--gold); text-shadow:0 0 14px var(--gold); }
 .card.winner .name{ border-color:var(--gold); color:var(--gold); text-shadow:0 0 17px var(--gold); box-shadow:0 0 22px rgba(255,210,74,.5); }
 .card.dim{ opacity:.5; filter:grayscale(.35); }
-
-/* ===== RESULTADO ===== */
-.result{
-  margin-top:8px; min-height:28px; text-align:center;
-  font-family:'Bungee', sans-serif; font-size:1.15rem; letter-spacing:1px; color:#fff;
-  opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease;
-}
+.result{ margin-top:4px; min-height:28px; text-align:center; font-family:'Bungee', sans-serif; font-size:1.15rem; letter-spacing:1px; color:#fff; opacity:0; transform:translateY(8px); transition:opacity .5s ease, transform .5s ease; }
 .result.on{ opacity:1; transform:translateY(0); }
 .result .g{ color:var(--gold); text-shadow:0 0 12px var(--gold), 0 0 28px var(--gold); }
-
-@media(max-width:680px){
-  .stage{ gap:14px; }
-  .cards{ gap:10px; }
-  .card{ width:108px; }
-  .frame{ height:150px; }
-  .main-title{ font-size:1.5rem; letter-spacing:.2em; }
-  #timer{ font-size:36px; }
-}
+.controls{ display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; }
+.btn{ font-family:'Bebas Neue', sans-serif; font-size:1.1rem; letter-spacing:.16em; color:#000; background:var(--neon-pink); border:none; padding:11px 30px; border-radius:999px; cursor:pointer; transition:all .3s cubic-bezier(.4,0,.2,1); box-shadow:0 0 15px var(--neon-pink), 0 0 30px rgba(255,45,154,.5); text-transform:uppercase; }
+.btn:hover:not(:disabled){ transform:scale(1.04); box-shadow:0 0 30px var(--neon-pink), 0 0 60px rgba(255,45,154,.55); }
+.btn:disabled{ opacity:.4; cursor:not-allowed; filter:grayscale(.4); box-shadow:none; }
+.conn{ display:flex; align-items:center; gap:7px; font-family:'Orbitron', sans-serif; font-size:11px; letter-spacing:1px; color:var(--bright-pink); text-transform:uppercase; }
+.dot{ width:9px; height:9px; border-radius:50%; background:#5a5a5a; transition:background .3s; }
+.dot.ready{ background:#00e676; box-shadow:0 0 10px #00e676; }
+.dot.live{ background:var(--hot-pink); box-shadow:0 0 10px var(--hot-pink); animation:blink 1.4s ease-in-out infinite; }
+@keyframes blink{ 0%,100%{opacity:1} 50%{opacity:.35} }
+@media(max-width:680px){ .stage{ gap:14px; } .cards{ gap:10px; } .card{ width:108px; } .frame{ height:150px; } .main-title{ font-size:1.5rem; letter-spacing:.2em; } #timer{ font-size:36px; } }
 </style>
 </head>
 <body>
-
 <div class="overlay">
   <div class="main-title"><span class="deco">✦</span>VOTA EN EL CHAT<span class="deco">✦</span></div>
-
   <div class="stage">
     <div class="cards" id="cards"></div>
-    <div class="timer-wrap" id="timerWrap">
-      <span id="timer">20</span><small>SEG</small>
-    </div>
+    <div class="timer-wrap" id="timerWrap"><span id="timer">20</span><small>SEG</small></div>
   </div>
-
   <div class="result" id="result"></div>
+  <div class="controls">
+    <button class="btn" id="rollBtn">Rolear Killers</button>
+    <button class="btn" id="voteBtn" disabled>Iniciar Votación</button>
+    <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">Conectando…</span></div>
+  </div>
 </div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-(function(){
+(function () {
 'use strict';
-
-const FB_CONFIG = {
-  apiKey: "AIzaSyCvOE9lhvEy3ts01nQyUBxL76gxW9qCCG8",
-  authDomain: "bloodsitax-timer.firebaseapp.com",
-  databaseURL: "https://bloodsitax-timer-default-rtdb.firebaseio.com",
-  projectId: "bloodsitax-timer",
-  storageBucket: "bloodsitax-timer.firebasestorage.app",
-  messagingSenderId: "273272843655",
-  appId: "1:273272843655:web:ea5902418ea67a1c48b722"
-};
-const FB_PATH = 'votacion-killer/estado';
-const LETTERS = ['A','B','C','D'];
-
-const cardsEl  = document.getElementById('cards');
-const timerWrap= document.getElementById('timerWrap');
-const timerEl  = document.getElementById('timer');
-const resultEl = document.getElementById('result');
-
-const setImg = (el, src) => { el.style.backgroundImage = 'url("' + src + '")'; };
-function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-/* construir 4 tarjetas vacías */
+const CHANNEL='bloodsitax', VOTE_SECONDS=20, REVEAL_GAP=1000, SPIN_MS=750;
+const KILLERS = [
+  {name:'Arponero',img:'imagenes_killers/Arponero.png'},{name:'Bruja',img:'imagenes_killers/Bruja.png'},
+  {name:'Bubba',img:'imagenes_killers/Bubba.png'},{name:'Caballero',img:'imagenes_killers/Caballero.png'},
+  {name:'Cazadora',img:'imagenes_killers/Cazadora.png'},{name:'Cenobite',img:'imagenes_killers/Cenobite.png'},
+  {name:'Cerda',img:'imagenes_killers/Cerda.png'},{name:'Chucky',img:'imagenes_killers/Chucky.png'},
+  {name:'Comerciante',img:'imagenes_killers/Comerciante.png'},{name:'Demogorgon',img:'imagenes_killers/Demogorgon.png'},
+  {name:'Deterioro',img:'imagenes_killers/Deterioro.png'},{name:'Doctor',img:'imagenes_killers/Doctor.png'},
+  {name:'Dracula',img:'imagenes_killers/Dracula.png'},{name:'Dredge',img:'imagenes_killers/Dredge.png'},
+  {name:'Espiritu',img:'imagenes_killers/Espiritu.png'},{name:'Freddy',img:'imagenes_killers/Freddy.png'},
+  {name:'Gemelos',img:'imagenes_killers/Gemelos.png'},{name:'Ghost Face',img:'imagenes_killers/Ghost%20Face.png'},
+  {name:'Kaneki',img:'imagenes_killers/Kaneki.png'},{name:'Krasue',img:'imagenes_killers/Krasue.png'},
+  {name:'Legion',img:'imagenes_killers/Legion.png'},{name:'Myers',img:'imagenes_killers/Myers.png'},
+  {name:'Nemesis',img:'imagenes_killers/Nemesis.png'},{name:'Oni',img:'imagenes_killers/Oni.png'},
+  {name:'Payaso',img:'imagenes_killers/Payaso.png'},{name:'Plaga',img:'imagenes_killers/Plaga.png'},
+  {name:'Pyramid Head',img:'imagenes_killers/Pyramid%20Head.png'},{name:'Sadako',img:'imagenes_killers/Sadako.png'},
+  {name:'Singularidad',img:'imagenes_killers/Singularidad.png'},{name:'Springtrap',img:'imagenes_killers/Springtrap.png'},
+  {name:'The Artist',img:'imagenes_killers/The%20Artist.png'},{name:'The First',img:'imagenes_killers/The%20First.png'},
+  {name:'The Hillbilly',img:'imagenes_killers/The%20Hillbilly.png'},{name:'The Houndmaster',img:'imagenes_killers/The%20Houndmaster.png'},
+  {name:'The Nurse',img:'imagenes_killers/The%20Nurse.png'},{name:'The Trapper',img:'imagenes_killers/The%20Trapper.png'},
+  {name:'The Wraith',img:'imagenes_killers/The%20Wraith.png'},{name:'Trickster',img:'imagenes_killers/Trickster.png'},
+  {name:'Unknown',img:'imagenes_killers/Unknown.png'},{name:'Vecna',img:'imagenes_killers/Vecna.png'},
+  {name:'Wesker',img:'imagenes_killers/Wesker.png'},{name:'Xenomorph',img:'imagenes_killers/Xenomorph.png'},
+];
+const LETTERS=['A','B','C','D'];
+const S={ options:[], rolled:false, voting:false, votes:{}, counts:{A:0,B:0,C:0,D:0}, total:0, timerId:null, left:0, socket:null, connected:false };
+const $=id=>document.getElementById(id);
+const cardsEl=$('cards'), rollBtn=$('rollBtn'), voteBtn=$('voteBtn'), timerWrap=$('timerWrap'), timerEl=$('timer'), resultEl=$('result'), dotEl=$('dot'), connTxt=$('connTxt');
+const setImg=(el,src)=>{ el.style.backgroundImage='url("'+src+'")'; };
+function esc(s){ return (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function buildCards(){
-  cardsEl.innerHTML = '';
-  LETTERS.forEach(L => {
-    const c = document.createElement('div');
-    c.className = 'card';
-    c.dataset.letter = L;
-    c.innerHTML =
-      '<div class="pct">0%</div>' +
-      '<div class="letter">'+L+'</div>' +
-      '<div class="frame"><div class="portrait"></div></div>' +
-      '<div class="name">— — —</div>' +
-      '<div class="bar"><i></i></div>';
+  cardsEl.innerHTML='';
+  LETTERS.forEach(L=>{
+    const c=document.createElement('div');
+    c.className='card show'; c.dataset.letter=L;
+    c.innerHTML='<div class="pct">0%</div><div class="letter">'+L+'</div><div class="frame"><div class="portrait"></div></div><div class="name">— — —</div><div class="bar"><i></i></div>';
     cardsEl.appendChild(c);
   });
 }
-const cardOf = L => cardsEl.querySelector('.card[data-letter="'+L+'"]');
-
-buildCards();
-render(null);   // muestra 4 cartas vacías de inmediato (no espera a Firebase)
-
-/* aplica el estado recibido de Firebase */
-function render(st){
-  if (!st || !st.options || !st.options.length || st.phase === 'idle'){
-    // sin datos / limpio → mostrar 4 cartas vacías listas (A/B/C/D)
-    timerWrap.classList.remove('on');
-    resultEl.classList.remove('on'); resultEl.innerHTML = '';
-    LETTERS.forEach(L => {
-      const c = cardOf(L);
-      c.className = 'card show';
-      c.querySelector('.name').textContent = '— — —';
-      c.querySelector('.pct').textContent = '0%';
-      c.querySelector('.bar i').style.width = '0%';
-      const portrait = c.querySelector('.portrait');
-      portrait.style.backgroundImage = '';
-      portrait.dataset.img = '';
-    });
-    return;
-  }
-
-  const counts = st.counts || {A:0,B:0,C:0,D:0};
-  const total  = st.total || 0;
-  const phase  = st.phase || 'rolled';
-
-  // pintar cada card según su opción
-  st.options.forEach(opt => {
-    const c = cardOf(opt.letter);
-    if (!c) return;
-    c.classList.add('show');
-    const portrait = c.querySelector('.portrait');
-    if (portrait.dataset.img !== opt.img){ setImg(portrait, opt.img); portrait.dataset.img = opt.img; }
-    c.querySelector('.name').textContent = opt.name;
-  });
-
-  // fase
-  LETTERS.forEach(L => {
-    const c = cardOf(L);
-    c.classList.remove('voting','results','winner','dim');
-    if (phase === 'voting') c.classList.add('voting');
-    if (phase === 'results') c.classList.add('results');
-    const pct = total ? Math.round((counts[L]||0)/total*100) : 0;
-    c.querySelector('.pct').textContent = pct + '%';
-    c.querySelector('.bar i').style.width = pct + '%';
-  });
-
-  // timer
-  if (phase === 'voting'){
-    timerWrap.classList.add('on');
-    timerEl.textContent = Math.max(0, st.left || 0);
-    timerEl.classList.toggle('low', (st.left || 0) <= 5);
-  } else {
-    timerWrap.classList.remove('on');
-  }
-
-  // resultado / ganador
-  if (phase === 'results' && st.winner){
-    const w = st.winner;
-    if (w.empty){
-      resultEl.innerHTML = 'Sin votos 😶';
-    } else if (w.tie){
-      w.letters.forEach(L => cardOf(L).classList.add('winner'));
-      LETTERS.filter(L => w.letters.indexOf(L) === -1).forEach(L => cardOf(L).classList.add('dim'));
-      resultEl.innerHTML = '¡EMPATE! → ' + w.letters.join(' / ');
-    } else {
-      const L = w.letters[0];
-      const opt = st.options.find(o => o.letter === L);
-      cardOf(L).classList.add('winner');
-      LETTERS.filter(x => x !== L).forEach(x => cardOf(x).classList.add('dim'));
-      resultEl.innerHTML = 'GANADOR: <span class="g">' + L + ') ' + esc(opt ? opt.name : '') + '</span> 🩸';
-    }
-    resultEl.classList.add('on');
-  } else {
-    resultEl.classList.remove('on'); resultEl.innerHTML = '';
-  }
+const cardOf=L=>cardsEl.querySelector('.card[data-letter="'+L+'"]');
+function pickFour(){
+  const pool=KILLERS.slice();
+  for(let i=pool.length-1;i>0;i--){ const r=new Uint32Array(1); crypto.getRandomValues(r); const j=r[0]%(i+1); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return pool.slice(0,4);
 }
-
-/* conectar Firebase y escuchar */
-try {
-  const app = firebase.initializeApp(FB_CONFIG);
-  const ref = firebase.database(app).ref(FB_PATH);
-  ref.on('value', snap => { render(snap.val()); });
-} catch(e){
-  console.error('Error de conexión Firebase:', e);
+function preload(){ KILLERS.forEach(k=>{ const im=new Image(); im.src=k.img; }); }
+function spinCard(card,finalKiller,done){
+  const portrait=card.querySelector('.portrait');
+  portrait.classList.add('spinning');
+  const start=performance.now();
+  (function tick(now){
+    if(now-start<SPIN_MS){ setImg(portrait,KILLERS[Math.floor(Math.random()*KILLERS.length)].img); setTimeout(()=>requestAnimationFrame(tick),70); }
+    else{ setImg(portrait,finalKiller.img); portrait.classList.remove('spinning'); card.querySelector('.name').textContent=finalKiller.name; done&&done(); }
+  })(performance.now());
 }
-
+function roll(){
+  if(S.voting) return;
+  rollBtn.disabled=true; voteBtn.disabled=true; resetResults();
+  S.rolled=false; S.options=[]; S.votes={}; S.counts={A:0,B:0,C:0,D:0}; S.total=0;
+  const cards=[...cardsEl.children];
+  cards.forEach(c=>{ c.className='card show'; c.querySelector('.name').textContent='— — —'; c.querySelector('.pct').textContent='0%'; c.querySelector('.bar i').style.width='0%'; });
+  const chosen=pickFour();
+  chosen.forEach((k,i)=>S.options.push({letter:LETTERS[i],name:k.name,img:k.img}));
+  let revealed=0;
+  chosen.forEach((k,i)=>{ setTimeout(()=>{ spinCard(cards[i],k,()=>{ if(++revealed===4){ S.rolled=true; rollBtn.disabled=false; voteBtn.disabled=false; } }); },i*REVEAL_GAP); });
+}
+function startVoting(){
+  if(!S.rolled||S.voting) return;
+  S.voting=true; S.votes={}; S.counts={A:0,B:0,C:0,D:0}; S.total=0; resetResults();
+  voteBtn.disabled=true; rollBtn.disabled=true;
+  dotEl.classList.add('live'); connTxt.textContent='Votación activa';
+  [...cardsEl.children].forEach(c=>c.classList.add('voting'));
+  updatePercents();
+  S.left=VOTE_SECONDS; timerWrap.classList.add('on'); timerEl.textContent=S.left; timerEl.classList.remove('low');
+  S.timerId=setInterval(()=>{ S.left--; timerEl.textContent=Math.max(0,S.left); if(S.left<=5) timerEl.classList.add('low'); if(S.left<=0) endVoting(); },1000);
+}
+function parseVote(text){ const t=(text||'').trim().toUpperCase(); return (t.length===1&&LETTERS.indexOf(t)!==-1)?t:null; }
+function registerVote(userId,text){
+  if(!S.voting) return null;
+  const v=parseVote(text); if(!v) return null;
+  if(Object.prototype.hasOwnProperty.call(S.votes,userId)) return null;
+  S.votes[userId]=v; S.counts[v]++; S.total++; updatePercents(); return v;
+}
+function updatePercents(){
+  LETTERS.forEach(L=>{ const pct=S.total?Math.round(S.counts[L]/S.total*100):0; const card=cardOf(L); card.querySelector('.pct').textContent=pct+'%'; card.querySelector('.bar i').style.width=pct+'%'; });
+}
+function endVoting(){
+  clearInterval(S.timerId); S.timerId=null; S.voting=false;
+  timerWrap.classList.remove('on');
+  dotEl.classList.remove('live'); dotEl.classList.add('ready'); connTxt.textContent='Conectado';
+  [...cardsEl.children].forEach(c=>{ c.classList.remove('voting'); c.classList.add('results'); });
+  const max=Math.max(...LETTERS.map(L=>S.counts[L]));
+  const winners=LETTERS.filter(L=>S.counts[L]===max);
+  if(S.total===0){ resultEl.innerHTML='Sin votos 😶'; }
+  else if(winners.length>1){
+    winners.forEach(L=>cardOf(L).classList.add('winner'));
+    LETTERS.filter(L=>winners.indexOf(L)===-1).forEach(L=>cardOf(L).classList.add('dim'));
+    resultEl.innerHTML='¡EMPATE! → '+winners.join(' / ');
+  } else {
+    const L=winners[0]; const opt=S.options.find(o=>o.letter===L);
+    cardOf(L).classList.add('winner');
+    LETTERS.filter(x=>x!==L).forEach(x=>cardOf(x).classList.add('dim'));
+    resultEl.innerHTML='GANADOR: <span class="g">'+L+') '+esc(opt?opt.name:'')+'</span> 🩸';
+  }
+  resultEl.classList.add('on'); rollBtn.disabled=false;
+}
+function resetResults(){
+  resultEl.classList.remove('on'); resultEl.innerHTML='';
+  [...cardsEl.children].forEach(c=>c.classList.remove('winner','dim','results','voting'));
+}
+function parseTags(line){ const tags={}; if(line[0]==='@'){ const end=line.indexOf(' '); line.slice(1,end).split(';').forEach(p=>{ const eq=p.indexOf('='); if(eq>=0) tags[p.slice(0,eq)]=p.slice(eq+1); }); } return tags; }
+function parseIRC(line){
+  const tags=parseTags(line); let i=0;
+  if(line[0]==='@') i=line.indexOf(' ')+1;
+  const rest=line.slice(i); let nick='';
+  if(rest[0]===':'){ const ex=rest.indexOf('!'); nick=ex>0?rest.slice(1,ex):''; }
+  const pm=rest.indexOf('PRIVMSG'); if(pm<0) return null;
+  const colon=rest.indexOf(':',pm);
+  return { tags, nick, text: colon>=0?rest.slice(colon+1):'' };
+}
+function connectTwitch(){
+  if(S.connected||S.socket) return;
+  let ws;
+  try{ ws=new WebSocket('wss://irc-ws.chat.twitch.tv:443'); } catch(e){ return; }
+  S.socket=ws;
+  ws.onopen=()=>{ ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands'); ws.send('PASS SCHMOOPIIE'); ws.send('NICK justinfan'+Math.floor(Math.random()*99999)); ws.send('JOIN #'+CHANNEL); S.connected=true; dotEl.classList.add('ready'); connTxt.textContent='Conectado'; };
+  ws.onmessage=(ev)=>{ ev.data.split('\r\n').forEach(line=>{ if(!line) return; if(line.indexOf('PING')===0){ ws.send('PONG :tmi.twitch.tv'); return; } if(line.indexOf('PRIVMSG')!==-1){ const p=parseIRC(line); if(!p) return; registerVote(p.tags['user-id']||p.nick,p.text); } }); };
+  ws.onclose=()=>{ S.connected=false; S.socket=null; dotEl.classList.remove('ready'); connTxt.textContent='Reconectando…'; setTimeout(connectTwitch,3000); };
+  ws.onerror=()=>{ try{ ws.close(); }catch(e){} };
+}
+buildCards(); preload(); connectTwitch();
+rollBtn.addEventListener('click',roll);
+voteBtn.addEventListener('click',startVoting);
+window.addEventListener('keydown',e=>{
+  const tag=(document.activeElement&&document.activeElement.tagName)||'';
+  if(tag==='INPUT'||tag==='TEXTAREA') return;
+  if(e.key==='r'||e.key==='R') roll();
+  if(e.key==='v'||e.key==='V') startVoting();
+});
 })();
 </script>
 </body>
