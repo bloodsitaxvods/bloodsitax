@@ -64,12 +64,12 @@ html, body{
 .main-title .deco{ color:var(--pk); margin:0 10px; }
 
 /* ===== COLUMNA SURVIVOR ===== */
-.survivor-col{ display:flex; flex-direction:column; align-items:center; }
+.survivor-col{ display:flex; flex-direction:column; align-items:center; gap:6px; }
 
-.survivor-frame{ position:relative; width:118px; height:118px; flex-shrink:0; }
+.survivor-frame{ position:relative; width:100px; height:100px; flex-shrink:0; }
 
 .survivor-card{
-  position:absolute; inset:0; border-radius:18px;
+  position:absolute; inset:0; border-radius:16px;
   background:linear-gradient(135deg,var(--almost-black) 0%,var(--dark-purple) 100%);
   border:2px solid var(--pk); overflow:hidden; z-index:1;
   box-shadow:0 0 22px rgba(255,45,154,.5), 0 0 48px rgba(255,45,154,.22);
@@ -82,12 +82,21 @@ html, body{
 }
 #survivorImg::after{
   content:''; position:absolute; bottom:0; left:0; right:0;
-  height:40px; background:linear-gradient(to top,rgba(10,0,5,.55),transparent);
+  height:34px; background:linear-gradient(to top,rgba(10,0,5,.55),transparent);
 }
 #survivorImg.rolling{ animation:sRoll .2s steps(2) infinite; }
 @keyframes sRoll{ 0%{filter:brightness(1.18) saturate(1.12)} 50%{filter:brightness(1.45) saturate(1.12) hue-rotate(12deg)} }
 #survivorImg.landed{ animation:sLand .65s ease-out forwards; }
 @keyframes sLand{ 0%{filter:brightness(4) saturate(0)} 100%{filter:brightness(1.18) saturate(1.12)} }
+
+/* nombre del survivor — sutil */
+#survivorName{
+  font-family:'Bebas Neue', sans-serif;
+  font-size:.85rem; letter-spacing:.08em;
+  color:#fff; opacity:.8; text-align:center;
+  text-shadow:0 0 5px rgba(255,45,154,.4);
+  min-height:1em; line-height:1;
+}
 
 /* ===== PERKS EN DIAMANTE EN FILA ===== */
 .perks-col{ display:flex; flex-direction:column; align-items:center; }
@@ -194,6 +203,7 @@ html, body{
           <div id="survivorImg"></div>
         </div>
       </div>
+      <div id="survivorName">—</div>
     </div>
 
     <!-- ===== PERKS ===== -->
@@ -330,6 +340,7 @@ const survivors = [
 const $ = id => document.getElementById(id);
 const perkImgEls = [$('perk1'),$('perk2'),$('perk3'),$('perk4')];
 const survivorImgEl = $('survivorImg');
+const survivorNameEl = $('survivorName');
 const burstEl = $('burst');
 const spinBtn = $('spinBtn');
 const loadWrap = $('loadWrap');
@@ -381,6 +392,7 @@ function lockSurvivor() {
   state.survivorSlot.locked = true;
   state.survivorSlot.final  = final;
   setImg(survivorImgEl, final.img);
+  survivorNameEl.textContent = final.name;
   survivorImgEl.classList.remove('rolling');
   survivorImgEl.classList.add('landed');
   setTimeout(() => survivorImgEl.classList.remove('landed'), 650);
@@ -423,6 +435,7 @@ function spin() {
   spinBtn.disabled = true;
   spinBtn.classList.add('btn--spinning');
   spinBtn.textContent = 'GIRANDO...';
+  survivorNameEl.textContent = '—';
   survivorImgEl.classList.remove('landed');
   survivorImgEl.classList.add('rolling');
   for (let i = 0; i < 4; i++) {
