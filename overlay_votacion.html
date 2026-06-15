@@ -15,7 +15,7 @@
   --bright-pink:#FF69B4; --gold:#ffd24a; --chroma:#00FF00;
 }
 html, body{ width:100%; min-height:100vh; background:var(--chroma); font-family:'Bebas Neue', sans-serif; overflow:hidden; }
-.overlay{ width:100%; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; padding:24px 18px; }
+.overlay{ width:100%; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px; padding:24px 18px; }
 .main-title{ font-family:'Bebas Neue', sans-serif; font-size:2rem; letter-spacing:.3em; color:#fff; text-transform:uppercase; text-align:center; text-shadow:0 0 4px #fff, 0 0 12px var(--neon-pink), 0 0 26px var(--hot-pink), 0 0 46px var(--deep-magenta); }
 .main-title .deco{ color:var(--neon-pink); margin:0 12px; }
 .stage{ display:flex; flex-direction:row; align-items:center; justify-content:center; gap:26px; }
@@ -26,12 +26,12 @@ html, body{ width:100%; min-height:100vh; background:var(--chroma); font-family:
 @keyframes tick{ 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
 .timer-wrap small{ font-family:'Orbitron', sans-serif; font-size:13px; letter-spacing:2px; color:var(--bright-pink); }
 .cards{ display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:nowrap; }
-.card{ position:relative; width:150px; opacity:0; transform:translateY(20px) scale(.92); transition:opacity .4s ease, transform .5s cubic-bezier(.2,1.2,.3,1); }
+.card{ position:relative; width:118px; opacity:0; transform:translateY(20px) scale(.92); transition:opacity .4s ease, transform .5s cubic-bezier(.2,1.2,.3,1); }
 .card.show{ opacity:1; transform:translateY(0) scale(1); }
-.pct{ position:absolute; top:-40px; left:50%; transform:translateX(-50%) scale(.6); font-family:'Orbitron', sans-serif; font-weight:900; font-size:24px; color:#fff; text-shadow:0 0 10px var(--hot-pink), 0 0 24px var(--hot-pink); opacity:0; transition:opacity .4s ease, transform .4s cubic-bezier(.2,1.4,.3,1); pointer-events:none; }
+.pct{ position:absolute; top:-32px; left:50%; transform:translateX(-50%) scale(.6); font-family:'Orbitron', sans-serif; font-weight:900; font-size:19px; color:#fff; text-shadow:0 0 10px var(--hot-pink), 0 0 24px var(--hot-pink); opacity:0; transition:opacity .4s ease, transform .4s cubic-bezier(.2,1.4,.3,1); pointer-events:none; }
 .card.voting .pct, .card.results .pct{ opacity:1; transform:translateX(-50%) scale(1); }
-.letter{ position:absolute; top:-14px; left:-14px; z-index:5; width:42px; height:42px; border-radius:50%; display:grid; place-items:center; font-family:'Orbitron', sans-serif; font-weight:900; font-size:20px; color:#fff; background:radial-gradient(circle at 35% 30%, #2a0018, #11000b); border:2px solid var(--hot-pink); box-shadow:0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5); text-shadow:0 0 8px var(--hot-pink); }
-.frame{ position:relative; height:200px; border-radius:16px; overflow:hidden; background:linear-gradient(135deg, var(--almost-black), var(--dark-purple)); border:1px solid var(--deep-magenta); box-shadow:0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12); animation:breathe 3.4s ease-in-out infinite; }
+.letter{ position:absolute; top:-12px; left:-12px; z-index:5; width:36px; height:36px; border-radius:50%; display:grid; place-items:center; font-family:'Orbitron', sans-serif; font-weight:900; font-size:17px; color:#fff; background:radial-gradient(circle at 35% 30%, #2a0018, #11000b); border:2px solid var(--hot-pink); box-shadow:0 0 12px var(--hot-pink), inset 0 0 10px rgba(255,0,127,.5); text-shadow:0 0 8px var(--hot-pink); }
+.frame{ position:relative; height:158px; border-radius:16px; overflow:hidden; background:linear-gradient(135deg, var(--almost-black), var(--dark-purple)); border:1px solid var(--deep-magenta); box-shadow:0 0 12px rgba(255,45,154,.35), inset 0 0 18px rgba(255,45,154,.12); animation:breathe 3.4s ease-in-out infinite; }
 @keyframes breathe{ 0%,100%{ box-shadow:0 0 10px rgba(255,45,154,.3), inset 0 0 16px rgba(255,45,154,.10); } 50%{ box-shadow:0 0 20px rgba(255,45,154,.7), inset 0 0 24px rgba(255,45,154,.22); } }
 .portrait{ width:100%; height:100%; background-size:cover; background-position:center top; background-repeat:no-repeat; }
 .portrait.spinning{ animation:roll .2s steps(2) infinite; }
