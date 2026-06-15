@@ -9,67 +9,6 @@
 (function () {
 'use strict';
 
-/* ───────────────── FIREBASE (publica estado para el overlay OBS) ───────────────── */
-const FB_CONFIG = {
-  apiKey: "AIzaSyCvOE9lhvEy3ts01nQyUBxL76gxW9qCCG8",
-  authDomain: "bloodsitax-timer.firebaseapp.com",
-  databaseURL: "https://bloodsitax-timer-default-rtdb.firebaseio.com",
-  projectId: "bloodsitax-timer",
-  storageBucket: "bloodsitax-timer.firebasestorage.app",
-  messagingSenderId: "273272843655",
-  appId: "1:273272843655:web:ea5902418ea67a1c48b722"
-};
-const FB_PATH = 'votacion-killer/estado';
-let fbRef = null;          // referencia a la rama
-let fbReady = false;
-let fbLastPush = 0;        // throttle de escrituras
-
-/* Conecta a Firebase (los scripts ya vienen cargados desde index.html) */
-let fbLastPayload = null;   // guarda el último estado por si Firebase aún no estaba listo
-function loadFirebase(){
-  if (fbReady && fbRef) return;
-  if (window.__bsxFbVotacion) { fbRef = window.__bsxFbVotacion; fbReady = true; flushPending(); return; }
-  if (!window.firebase || !firebase.database){
-    console.warn('Firebase SDK no cargado. Revisa los <script> de firebase en index.html');
-    setTimeout(loadFirebase, 600);   // reintenta por si los scripts aún cargan
-    return;
-  }
-  try {
-    let app;
-    const existing = firebase.apps && firebase.apps.find(a => a.options && a.options.projectId === FB_CONFIG.projectId);
-    app = existing || firebase.initializeApp(FB_CONFIG, 'votacion-' + Date.now());
-    fbRef = firebase.database(app).ref(FB_PATH);
-    window.__bsxFbVotacion = fbRef;
-    fbReady = true;
-    console.log('✓ Firebase votación conectado');
-    flushPending();
-  } catch(e){ console.warn('Firebase votación no disponible:', e); }
-}
-/* reenvía el último estado si quedó pendiente mientras Firebase conectaba */
-function flushPending(){
-  if (fbReady && fbRef && fbLastPayload){ try { fbRef.set(fbLastPayload); } catch(e){} }
-}
-
-/* Publica el estado actual al overlay. force=true ignora el throttle */
-function pushState(phase, force){
-  const now = Date.now();
-  const payload = {
-    phase: phase || 'idle',                       // idle | rolled | voting | results
-    options: S.options,                           // [{letter,name,img}]
-    counts: S.counts,
-    total: S.total,
-    left: S.left || 0,
-    voting: S.voting,
-    winner: S._winner || null,                    // {letters:[...], tie:bool}
-    ts: now
-  };
-  fbLastPayload = payload;                         // guarda siempre (por si Firebase aún no carga)
-  if (!fbReady || !fbRef){ loadFirebase(); return; }
-  if (!force && now - fbLastPush < 250) return;   // máx ~4 escrituras/seg
-  fbLastPush = now;
-  try { fbRef.set(payload); } catch(e){}
-}
-
 /* ───────────────── CONFIG ───────────────── */
 const CHANNEL      = 'bloodsitax';   // canal de Twitch a escuchar
 const VOTE_SECONDS = 20;             // duración de la votación
@@ -135,8 +74,7 @@ const S = {
   total: 0,
   timerId: null, left: 0,
   testId: null,
-  socket: null, connected: false,
-  _winner: null
+  socket: null, connected: false
 };
 
 /* ───────────────── DOM ───────────────── */
@@ -216,8 +154,6 @@ function roll(){
 
   S.rolled = false; S.options = [];
   S.votes = {}; S.counts = {A:0,B:0,C:0,D:0}; S.total = 0;
-  S._winner = null;
-  pushState('idle', true);   // overlay: limpia / estado en blanco
 
   const cards = [...cardsEl.children];
   cards.forEach(c => {
@@ -238,10 +174,8 @@ function roll(){
       spinCard(card, k, () => {
         if (++revealed === 4){
           S.rolled = true;
-          S._winner = null;
           rollBtn.disabled = false;
           voteBtn.disabled = false;
-          pushState('rolled', true);   // overlay: muestra los 4 killers
         }
       });
     }, i * REVEAL_GAP);
@@ -265,13 +199,11 @@ function startVoting(){
   timerWrap.classList.add('on');
   timerEl.textContent = S.left;
   timerEl.classList.remove('low');
-  pushState('voting', true);   // overlay: arranca votación
 
   S.timerId = setInterval(() => {
     S.left--;
     timerEl.textContent = Math.max(0, S.left);
     if (S.left <= 5) timerEl.classList.add('low');
-    pushState('voting', true);   // overlay: actualiza el timer cada segundo
     if (S.left <= 0) endVoting();
   }, 1000);
 }
@@ -291,7 +223,6 @@ function registerVote(userId, text){
   S.votes[userId] = v;
   S.counts[v]++; S.total++;
   updatePercents();
-  pushState('voting');   // overlay: actualiza % en vivo (throttle ~4/seg)
   return v;
 }
 
@@ -318,23 +249,19 @@ function endVoting(){
 
   if (S.total === 0){
     resultEl.innerHTML = 'Sin votos 😶';
-    S._winner = { letters: [], tie: false, empty: true };
   } else if (winners.length > 1){
     winners.forEach(L => cardOf(L).classList.add('winner'));
     LETTERS.filter(L => winners.indexOf(L) === -1).forEach(L => cardOf(L).classList.add('dim'));
     resultEl.innerHTML = '¡EMPATE! → ' + winners.join(' / ');
-    S._winner = { letters: winners, tie: true };
   } else {
     const L = winners[0];
     const opt = S.options.find(o => o.letter === L);
     cardOf(L).classList.add('winner');
     LETTERS.filter(x => x !== L).forEach(x => cardOf(x).classList.add('dim'));
     resultEl.innerHTML = 'GANADOR: <span class="g">' + L + ') ' + (opt ? opt.name : '') + '</span> 🩸';
-    S._winner = { letters: [L], tie: false };
   }
   resultEl.classList.add('on');
   rollBtn.disabled = false;
-  pushState('results', true);   // overlay: muestra ganador con glow dorado
 }
 
 function resetResults(){
@@ -490,7 +417,6 @@ function activate(){
   preload();        // imágenes en background
   connectTwitch();  // conectar el chat la primera vez
   loadGlobal7TV();  // emotes globales de 7TV (no necesita ID del canal)
-  loadFirebase();   // conectar a Firebase para publicar al overlay OBS
 }
 let activated = false;
 function maybeActivate(){ if (!activated){ activated = true; activate(); } }
@@ -501,7 +427,6 @@ document.querySelectorAll('[data-tab="votacion"],[data-goto="votacion"]').forEac
 
 /* ───────────────── controles ───────────────── */
 buildCards();
-loadFirebase();   // conecta Firebase de inmediato al cargar la página
 rollBtn.addEventListener('click', roll);
 voteBtn.addEventListener('click', startVoting);
 
